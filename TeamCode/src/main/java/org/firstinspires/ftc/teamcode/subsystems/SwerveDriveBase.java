@@ -12,6 +12,7 @@ import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveDriveKinematics;
 import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveDriveOdometry;
 import com.arcrobotics.ftclib.kinematics.wpilibkinematics.SwerveModuleState;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -61,5 +62,15 @@ public class SwerveDriveBase extends SubsystemBase {
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.resetPosAndIMU();
         pinpoint.recalibrateIMU();
+    }
+
+    private void setDrivePower(double x, double y, double a, double angle) {
+        double heading = pinpoint.getHeading(AngleUnit.RADIANS);
+        double rotationX = x * Math.cos(heading) - y * Math.sin(heading);
+        double rotationY = x * Math.sin(heading) + y * Math.cos(heading);
+        double power = Math.sqrt(Math.pow(rotationX, 2) + Math.pow(rotationY, 2));
+
+        double wheelAngle = Math.atan2(rotationX, rotationY);
+        double actualAngle = ;
     }
 }
