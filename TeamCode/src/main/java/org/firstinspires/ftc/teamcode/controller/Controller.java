@@ -1,10 +1,17 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.controller;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class Controller {
     public GamepadEx baseControl, utilControl;
+    public static class baseButtons {
+
+    }
+    public static class utilButtons {
+        public static GamepadKeys.Button shoot = GamepadKeys.Button.RIGHT_BUMPER;
+    }
 
     public Controller(Gamepad control1, Gamepad control2) {
         this.baseControl = new GamepadEx(control1);
@@ -16,6 +23,7 @@ public class Controller {
         baseControl = new GamepadEx(control1);
         utilControl = new GamepadEx(control2);
     }
+
 
 
 }
