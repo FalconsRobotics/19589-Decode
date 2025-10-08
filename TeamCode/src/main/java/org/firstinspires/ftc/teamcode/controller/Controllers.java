@@ -4,7 +4,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class Controller {
+public class Controllers {
     public GamepadEx baseControl, utilControl;
     public static class baseButtons {
 
@@ -13,7 +13,7 @@ public class Controller {
         public static GamepadKeys.Button shoot = GamepadKeys.Button.RIGHT_BUMPER;
     }
 
-    public Controller(Gamepad control1, Gamepad control2) {
+    public Controllers(Gamepad control1, Gamepad control2) {
         this.baseControl = new GamepadEx(control1);
         this.utilControl = new GamepadEx(control2);
 

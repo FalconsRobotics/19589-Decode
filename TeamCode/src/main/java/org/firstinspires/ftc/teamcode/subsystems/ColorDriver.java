@@ -22,15 +22,19 @@ public class ColorDriver {
 
     public static class Color {
         /// Spectrum: 0.28 - 0.72 ( > 0.73 is White)
-        public static double RED = 0.28;
-        public static double ORANGE = 0.3;
-        public static double YELLOW = 0.34;
+        public static double RED = 0.277;
+        public static double ORANGE = 0.333;
+        public static double YELLOW = 0.388;
+        public static double SAGE = 0.444;
         public static double GREEN = 0.5;
-        public static double TURQUOISE = 0.51;
-        public static double LIGHT_BLUE = 0.52;
-        public static double BLUE = 0.62;
-        public static double PURPLE = 0.7;
-        public static double WHITE = 0.73;
+        public static double AZURE = 0.555;
+        public static double BLUE = 0.611;
+        public static double INDIGO = 0.666;
+        public static double VIOLET = 0.722;
+        public static double WHITE = 1.0;
+
+        public static double MIN = 0.277;
+        public static double MAX = 0.723;
 
         public static class BALL {
             public static double GREEN = 0.5;
