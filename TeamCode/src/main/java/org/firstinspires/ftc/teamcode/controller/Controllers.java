@@ -16,13 +16,27 @@ public class Controllers {
     public Controllers(Gamepad control1, Gamepad control2) {
         this.baseControl = new GamepadEx(control1);
         this.utilControl = new GamepadEx(control2);
-
+    }
+    public Controllers(Gamepad control, int number) {
+        if (number == 1) {
+            this.baseControl = new GamepadEx(control);
+        }
+        else if (number == 2) {
+            this.utilControl = new GamepadEx(control);
+        }
+        else {
+            return;
+        }
     }
 
     public void initController(Gamepad control1, Gamepad control2) {
-        baseControl = new GamepadEx(control1);
-        utilControl = new GamepadEx(control2);
+        this.baseControl = new GamepadEx(control1);
+        this.utilControl = new GamepadEx(control2);
     }
+
+    public void initBaseControl(Gamepad control) {this.baseControl = new GamepadEx(control);}
+
+    public void initUtilControl(Gamepad control) {this.utilControl = new GamepadEx(control);}
 
 
 

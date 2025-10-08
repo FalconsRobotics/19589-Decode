@@ -4,10 +4,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 public class Button {
     public static class base {
-        public static GamepadKeys.Button shoot = GamepadKeys.Button.RIGHT_BUMPER;
+        public static GamepadKeys.Button button = GamepadKeys.Button.A;
     }
 
     public static class util {
-
+        public static GamepadKeys.Button button = GamepadKeys.Button.A;
     }
 }
