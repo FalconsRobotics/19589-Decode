@@ -5,17 +5,22 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.color.ColorDriver;
+import org.firstinspires.ftc.teamcode.color.Gradient;
 import org.firstinspires.ftc.teamcode.controller.Controllers;
 import org.firstinspires.ftc.teamcode.color.Color;
 import org.firstinspires.ftc.teamcode.color.LED;
 
-@TeleOp (name = "LED Testing (Nico)", group = "Test")
+@TeleOp (name = "LED Testing 10/08/25", group = "Test")
 public class TestLED extends LinearOpMode {
-    ColorDriver led = new ColorDriver(hardwareMap, true);
-    Controllers control = new Controllers(gamepad1, gamepad2);
+    public ColorDriver led;
+    Controllers control;
+    Gradient.CyclicGradient gradientCycle = new Gradient.CyclicGradient(Color.RED);
     double colorTracker = Color.MAX;
 
     public void runOpMode() {
+        led = new ColorDriver(hardwareMap);
+        control = new Controllers(gamepad1,gamepad2);
+
         while (opModeInInit()) {}
 
         while (opModeIsActive()) {
@@ -30,6 +35,9 @@ public class TestLED extends LinearOpMode {
             }
             else if (control.baseControl.isDown(GamepadKeys.Button.Y)) {
                 led.setLedColor(LED.CHAINED, Color.YELLOW);
+            }
+            else if (control.baseControl.isDown(GamepadKeys.Button.DPAD_DOWN)) {
+                led.setLedColor(LED.CHAINED, gradientCycle.getNextPosition(Color.RED, Color.VIOLET));
             }
             else {
                 led.setLedColor(LED.CHAINED, colorTracker);

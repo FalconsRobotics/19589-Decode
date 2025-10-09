@@ -3,12 +3,13 @@ import java.text.SimpleDateFormat
 //
 // build.gradle in FtcRobotController
 //
+// This is now an Android Library, so we apply the 'com.android.library' plugin
 apply plugin: 'com.android.library'
 
 android {
 
     defaultConfig {
-        applicationId 'com.qualcomm.ftcrobotcontroller'
+        // REMOVED: applicationId 'com.qualcomm.ftcrobotcontroller'
         minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
