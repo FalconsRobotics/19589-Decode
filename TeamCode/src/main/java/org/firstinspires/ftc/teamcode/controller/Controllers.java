@@ -38,6 +38,32 @@ public class Controllers {
 
     public void initUtilControl(Gamepad control) {this.utilControl = new GamepadEx(control);}
 
+    public static class Toggle {
+        boolean toggled;
+
+        public Toggle(boolean state) {
+            this.toggled = state;
+        }
+
+        public boolean isTrue() {
+            return this.toggled;
+        }
+        public void toggle() {
+            if (this.toggled == true) {
+                this.setFalse();
+            }
+            else if (this.toggled == false) {
+                this.setTrue();
+            }
+        }
+        public void setTrue() {
+            this.toggled = true;
+        }
+        public void setFalse() {
+            this.toggled = false;
+        }
+    }
+
 
 
 }

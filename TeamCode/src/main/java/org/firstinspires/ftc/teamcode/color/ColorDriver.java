@@ -4,28 +4,25 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class ColorDriver {
-    private boolean chained;
-    private Servo LED1;
-    //LED2, LED3;
+    private Servo LED0,LED1, LED2;
 
     public ColorDriver(HardwareMap map) {
+        LED0 = map.get(Servo.class, "led0");
         LED1 = map.get(Servo.class, "led1");
-    }
-
-    public void initLED(HardwareMap map) {
-        LED1 = map.get(Servo.class, "led1");
+        LED2 = map.get(Servo.class, "led2");
     }
 
     public void setLedColor(LED led, double color) {
-        if (led == LED.CHAINED || led == LED.LED1) {LED1.setPosition(color);}
-        //else if (led == LED.LED2) {LED2.setPosition(color);}
-        //else if (led == LED.LED3) {LED3.setPosition(color);}
+        if (led == LED.CHAINED || led == LED.LED0) {LED0.setPosition(color);}
+        else if (led == LED.LED1) {LED1.setPosition(color);}
+        else if (led == LED.LED2) {LED2.setPosition(color);}
+        else if (led == LED.ALL) {LED0.setPosition(color); LED1.setPosition(color); LED2.setPosition(color);}
     }
 
     public double getLedColor(LED led) {
-        if (led == LED.CHAINED || led == LED.LED1) {return LED1.getPosition();}
-        //else if (led == LED.LED2) {return LED2.getPosition();}
-        //else if (led == LED.LED3) {return LED3.getPosition();}
+        if (led == LED.CHAINED || led == LED.LED0) {return LED0.getPosition();}
+        else if (led == LED.LED1) {return LED1.getPosition();}
+        else if (led == LED.LED2) {return LED2.getPosition();}
         else return 1738;
     }
 
