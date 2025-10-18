@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import
 
 public class Limelight {
     Limelight3A limelight;
@@ -73,9 +72,6 @@ public class Limelight {
         return ballPos;
     }
 
-    class BallDetected{
-        int x, y, area, color;
-    }
     public double[] findClosestPurpleBall(){
         double[] llpython = result.getPythonOutput();
         double[] ballPos = new double[2];
