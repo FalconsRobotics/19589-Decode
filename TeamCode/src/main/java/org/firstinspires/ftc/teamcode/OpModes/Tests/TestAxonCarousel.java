@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.controller.Controllers;
-import org.firstinspires.ftc.teamcode.subsystems.Carousel;
-import org.firstinspires.ftc.teamcode.subsystems.CConst;
+import org.firstinspires.ftc.teamcode.Controller.Controllers;
+import org.firstinspires.ftc.teamcode.Subsystems.Carousel;
+import org.firstinspires.ftc.teamcode.Constants.CarouselConstants;
 
 @TeleOp(name = "Carousel Test - Nico", group = "Test")
 public class TestAxonCarousel extends LinearOpMode {
@@ -36,13 +36,13 @@ public class TestAxonCarousel extends LinearOpMode {
             double positionInt = carousel.getPosInt();
 
             if (control.base.isDown(GamepadKeys.Button.X)) {
-                errorOutput = carousel.toPosReturn(CConst.input1);
+                errorOutput = carousel.toPosReturn(CarouselConstants.input1);
             }
             else if (control.base.isDown(GamepadKeys.Button.A)) {
-                errorOutput = carousel.toPosReturn(CConst.input2);
+                errorOutput = carousel.toPosReturn(CarouselConstants.input2);
             }
             else if (control.base.isDown(GamepadKeys.Button.B)) {
-                errorOutput = carousel.toPosReturn(CConst.input3);
+                errorOutput = carousel.toPosReturn(CarouselConstants.input3);
             }
             else if (control.base.isDown(GamepadKeys.Button.DPAD_UP)) {
                 errorOutput = carousel.toPosReturn(1);

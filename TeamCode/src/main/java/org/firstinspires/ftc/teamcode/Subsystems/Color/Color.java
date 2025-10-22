@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.color;
+package org.firstinspires.ftc.teamcode.Subsystems.Color;
 
 public class Color {
     /// Spectrum: 0.277 - 0.722 ( > 0.722 is White)

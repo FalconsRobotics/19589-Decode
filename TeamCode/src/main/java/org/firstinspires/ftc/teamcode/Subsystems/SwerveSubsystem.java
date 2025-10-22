@@ -1,29 +1,28 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+import org.firstinspires.ftc.teamcode.Constants.DriveConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //sets the teleop name visable on the driver station and sets it as a teleop program
-public class Functions {
+public class SwerveSubsystem {
     DcMotor steeringMotor;
     DcMotor driveA, driveB, driveC;
-    GoBildaPinpointDriver odo;
+    public GoBildaPinpointDriver odo;
     private HardwareMap hardwareMap;
 
-
     //publicly used variables set off the bat
-    double powerDir = 1; //Changes the dirrection of power for the wheels
+    double powerDir = 1; //Changes the direction of power for the wheels
     int ticksToMove = 0; //Difference between where you are and need to be for rotating swerve modules in ticks
     double joyStickAngle = 0; //angle of left joystick to create vector
     double wheelFlip = 0; //flips the angle of the wheels to account for flipping
@@ -97,7 +96,7 @@ public class Functions {
     public void recenterModules(){
         steeringMotor.setTargetPosition(0);
         steeringMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION); //TODO: change default to this instead of encoder
-        steeringMotor.setPower(Constants.steeringPower);
+        steeringMotor.setPower(DriveConstants.steeringPower);
     }
     public void Drive(double joyStickX, double joyStickY, double joyStickRotation, double targetRobotHeading) {
         //updates pinpoint
@@ -128,18 +127,18 @@ public class Functions {
         //TODO: tune heading velocity constraint, strength and fix constant spinning
         //correction so if not moving right joystick it holds heading to account for drift
         if (Math.abs(joyStickRotation) <= 0.05){
-            if(!latch && botHeadingVel < 0.2 * Constants.powerMult){
+            if(!latch && botHeadingVel < 0.2 * DriveConstants.powerMult){
                 lastHeading = normalizedIMUBotHeading;
                 latch = true;
             }else if(latch){
                 if(targetRobotHeading != -1) lastHeading = targetRobotHeading;
                 holdDelta = normalizeTo180(lastHeading - normalizedIMUBotHeading);
-                if(Math.abs(holdDelta) > 2) joyStickRotation = holdDelta * Constants.turningGainP;
+                if(Math.abs(holdDelta) > 2) joyStickRotation = holdDelta * DriveConstants.turningGainP;
             }
         }else latch = false;
 
         //current swerve module angle calculation
-        double unnormalizedWheelAngle = (steeringMotor.getCurrentPosition() / (Constants.ticksPerRev * Constants.gearRatio)) * 360;
+        double unnormalizedWheelAngle = (steeringMotor.getCurrentPosition() / (DriveConstants.ticksPerRev * DriveConstants.gearRatio)) * 360;
 
         //current swerve module angle normalized to -180 to 180
         double currentWheelAngle = normalizeTo180(unnormalizedWheelAngle);
@@ -154,30 +153,30 @@ public class Functions {
         wheelFlip %= 360;
 
         //if difference in angles is too large flips direction of wheels so the turning is more efficient
-        if(Math.abs(angleDelta) >= Constants.flipPoint){
+        if(Math.abs(angleDelta) >= DriveConstants.flipPoint){
             wheelFlip += 180 * Math.signum(angleDelta);
             powerDir *= -1;
         }
 
         //re-calculates the wheel angle and delta after the corrections
-        flippedWheelAngle = ((steeringMotor.getCurrentPosition() / (Constants.ticksPerRev * Constants.gearRatio)) * 360) + wheelFlip;
+        flippedWheelAngle = ((steeringMotor.getCurrentPosition() / (DriveConstants.ticksPerRev * DriveConstants.gearRatio)) * 360) + wheelFlip;
         flippedWheelAngle %= 360;
 
         angleDelta = normalizeTo180(joyStickAngle - flippedWheelAngle);
 
         //calculates the target motor position to turn the wheels
-        double targetPos = (angleDelta / 360) * Constants.ticksPerRev * Constants.gearRatio;
+        double targetPos = (angleDelta / 360) * DriveConstants.ticksPerRev * DriveConstants.gearRatio;
         ticksToMove = steeringMotor.getCurrentPosition() + (int)Math.round(targetPos);
 
         //turns the module to set position
         steeringMotor.setTargetPosition(ticksToMove);
         steeringMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION); //TODO Change to default?
-        steeringMotor.setPower(Constants.steeringPower);
+        steeringMotor.setPower(DriveConstants.steeringPower);
 
         //basically tank drive power
-        double leftWheel = (power * powerDir + joyStickRotation) * Constants.powerMult;
-        double rightWheel = (power * powerDir - joyStickRotation) * Constants.powerMult;
-        double middleWheel = (power * powerDir) * Constants.powerMult;
+        double leftWheel = (power * powerDir + joyStickRotation) * DriveConstants.powerMult;
+        double rightWheel = (power * powerDir - joyStickRotation) * DriveConstants.powerMult;
+        double middleWheel = (power * powerDir) * DriveConstants.powerMult;
         //sets drive power on wheels depending on the direction that the swerve modules are facing to account for the turning
         //2
         if(currentWheelAngle > 30 && currentWheelAngle <= 90){
@@ -220,7 +219,7 @@ public class Functions {
             this.x = x;
             this.y = y;
             this.heading = heading;
-            this.precision = Constants.defaultPrecision;
+            this.precision = DriveConstants.defaultPrecision;
             this.action = null;
             this.waitMS = 0;
         }
@@ -235,13 +234,13 @@ public class Functions {
         public PathPoint(Runnable action, double waitMS){
             this.action = action;
             this.waitMS = waitMS;
-            this.precision = Constants.defaultPrecision;
+            this.precision = DriveConstants.defaultPrecision;
         }
         public PathPoint(double x, double y, double heading, Runnable action){
             this.x = x;
             this.y = y;
             this.heading = heading;
-            this.precision = Constants.defaultPrecision;
+            this.precision = DriveConstants.defaultPrecision;
             this.action = action;
             this.waitMS = 0;
         }
@@ -350,10 +349,10 @@ public class Functions {
             }//if error distance is greater than the inputted precision runs the drive code
             else if (error > precision) {
                 //calculated proportional  aspect of speed based off the error times a constant
-                p = error * Constants.driveToPointGainP;
+                p = error * DriveConstants.driveToPointGainP;
 
                 // Speed factor, proportional to distance with a feed forward added in as the minimum power needed to move motors so it can always move closer
-                speed = Math.min(p + Constants.driveToPointF, 1.0);
+                speed = Math.min(p + DriveConstants.driveToPointF, 1.0);
 
                 //if you are not on the last point and the next point is not a wait then set speed to 1 to go full speed through points
                 if(currentPointIndex + 1 < path.points.size() && path.points.get(currentPointIndex + 1).waitMS == 0) speed = 1;

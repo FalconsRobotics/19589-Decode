@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.Limelight;
+import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 
 @TeleOp(name = "Limelight Testing - Teigan", group = "Test")
 public class LimelightTesting extends LinearOpMode {

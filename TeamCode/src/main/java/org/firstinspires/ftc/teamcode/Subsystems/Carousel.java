@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Constants.CarouselConstants;
 
 
 public class Carousel {
@@ -95,13 +96,13 @@ public class Carousel {
 
     /// Returns if Carousel is near set position (0 if not)
     public int getPosInt() {
-        if (inRange(getPos(), CConst.input1, 0.1)) {
+        if (inRange(getPos(), CarouselConstants.input1, 0.1)) {
             return 1;
         }
-        else if (inRange(getPos(), CConst.input2, 0.1)) {
+        else if (inRange(getPos(), CarouselConstants.input2, 0.1)) {
             return 2;
         }
-        else if (inRange(getPos(), CConst.input3, 0.1)) {
+        else if (inRange(getPos(), CarouselConstants.input3, 0.1)) {
             return 3;
         }
         else return 0;
@@ -112,9 +113,9 @@ public class Carousel {
         double currentPos = getPos();
         double error;
         double FF = 0.2;
-        if (targetPos == 1) {error = CConst.input1 - currentPos;}
-        else if (targetPos == 2) {error = CConst.input2 - currentPos;}
-        else if (targetPos == 3) {error = CConst.input3 - currentPos;}
+        if (targetPos == 1) {error = CarouselConstants.input1 - currentPos;}
+        else if (targetPos == 2) {error = CarouselConstants.input2 - currentPos;}
+        else if (targetPos == 3) {error = CarouselConstants.input3 - currentPos;}
         else return 0;
 
         double errorAbs = Math.abs(error);
@@ -124,7 +125,7 @@ public class Carousel {
     }
     public double intakeToPos(double target) {
         double error = target - getPos();
-        double power = Math.abs(CConst.P_VALUE * error);
+        double power = Math.abs(CarouselConstants.P_VALUE * error);
 
         carousel.setPower(power);
         return error;
@@ -140,12 +141,12 @@ public class Carousel {
     }
 
     public boolean between01() {
-        return getPos() > 0 && getPos() < CConst.input1 ? true : false;
+        return getPos() > 0 && getPos() < CarouselConstants.input1 ? true : false;
     }
     public boolean between12() {
-        return getPos() > CConst.input1 && getPos() < CConst.input2 ? true : false;
+        return getPos() > CarouselConstants.input1 && getPos() < CarouselConstants.input2 ? true : false;
     }
     public boolean between23() {
-        return getPos() > CConst.input2 && getPos() < CConst.input3 ? true : false;
+        return getPos() > CarouselConstants.input2 && getPos() < CarouselConstants.input3 ? true : false;
     }
 }

@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Constants;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-public class Constants {
+public class DriveConstants {
     //works well with 0.3 drive power, 0.1 driveToPointGainP
     public static double ticksPerRev = 751.8;
     public static double gearRatio = 32/16;

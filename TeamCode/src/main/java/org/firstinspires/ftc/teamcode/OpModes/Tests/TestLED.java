@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.color.ColorDriver;
-import org.firstinspires.ftc.teamcode.controller.Controllers;
-import org.firstinspires.ftc.teamcode.color.Color;
-import org.firstinspires.ftc.teamcode.color.LED;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.ColorDriver;
+import org.firstinspires.ftc.teamcode.Controller.Controllers;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.LED;
 
 @TeleOp (name = "LED Testing 10/08/25", group = "Test")
 public class TestLED extends LinearOpMode {
