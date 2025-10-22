@@ -15,8 +15,6 @@ public class LimelightTesting extends LinearOpMode {
         while (opModeInInit()) {}
 
         while (opModeIsActive()) {
-
-
             telemetry.addData("Motif (int)", ll.getMotif());
             telemetry.addData("Angle to Blue", ll.angleToGoalBlue());
             telemetry.addData("Angle to Red", ll.angleToGoalRed());
