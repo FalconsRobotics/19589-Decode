@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.Controller;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-public class Controllers {
+public class ControllerSubsystem {
     public GamepadEx base, util;
 
-    public Controllers(Gamepad control1, Gamepad control2) {
+    public ControllerSubsystem(Gamepad control1, Gamepad control2) {
         this.base = new GamepadEx(control1);
         this.util = new GamepadEx(control2);
     }

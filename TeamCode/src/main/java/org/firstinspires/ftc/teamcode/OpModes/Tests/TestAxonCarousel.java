@@ -4,20 +4,20 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Controller.Controllers;
+import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Carousel;
 import org.firstinspires.ftc.teamcode.Constants.CarouselConstants;
 
 @TeleOp(name = "Carousel Test - Nico", group = "Test")
 public class TestAxonCarousel extends LinearOpMode {
-    public Controllers control;
+    public ControllerSubsystem control;
     public Carousel carousel;
     public double carouselPower = 0;
 
     public void runOpMode() {
-        control = new Controllers(gamepad1, gamepad2);
+        control = new ControllerSubsystem(gamepad1, gamepad2);
         carousel = new Carousel(hardwareMap);
-        Controllers.Toggle nextBall = new Controllers.Toggle(false);
+        ControllerSubsystem.Toggle nextBall = new ControllerSubsystem.Toggle(false);
         boolean ballDetected = false;
         double errorOutput = 0;
         double newOutput = 0;
