@@ -34,6 +34,10 @@ public class Limelight {
         }
     }
 
+    public int getMotif() {
+        findMotif();
+        return motif;
+    }
     //returns angle X to the center of shooting goal(Blue Alliance)
     public double angleToGoalBlue(){
         limelight.pipelineSwitch(1);

@@ -26,4 +26,20 @@ public class ColorDriver {
         else return 1738;
     }
 
+    public void setLED0(double color) {LED0.setPosition(color);}
+    public void setLED1(double color) {LED1.setPosition(color);}
+    public void setLED2(double color) {LED2.setPosition(color);}
+    public void setLEDChained(double color) {LED0.setPosition(color);}
+    public void setLEDAll(double color) {LED0.setPosition(color); LED1.setPosition(color); LED2.setPosition(color);}
+
+    public double getLed0() {
+        return LED0.getPosition();
+    }
+    public double getLed1() {
+        return LED1.getPosition();
+    }
+    public double getLed2() {
+        return LED2.getPosition();
+    }
+
 }
