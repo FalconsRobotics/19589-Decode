@@ -1,56 +1,46 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
-import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.seattlesolvers.solverslib.controller.Controller;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
-import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
-import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveBase;
-import org.firstinspires.ftc.teamcode.Subsystems.ShooterSubsystem;
-
-import java.util.List;
+import org.firstinspires.ftc.teamcode.Commands.Drivebase.DriveFieldCentricCommand;
+import org.firstinspires.ftc.teamcode.Commands.Drivebase.DriveRobotCentricCommand;
+import org.firstinspires.ftc.teamcode.Commands.Intake.IntakeSetPowerCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.SubsystemCollection;
 
 @TeleOp(name = "Main")
-public class Main extends OpMode {
-    public MecanumDriveBase drivebase;
-    public IntakeElevatorSubsystem intake;
-    public CarouselSubsystem hopper;
-    public ShooterSubsystem shooter;
+public class Main extends CommandOpMode {
+    private SubsystemCollection sys;
 
-    public GamepadEx Gamepad1 = new GamepadEx(gamepad1);
-    public GamepadEx Gamepad2 = new GamepadEx(gamepad2);
+    private GamepadEx Gamepad1;
+    private GamepadEx Gamepad2;
 
     @Override
-    public void init() {
-        drivebase = new MecanumDriveBase(hardwareMap);
-        intake = new IntakeElevatorSubsystem(hardwareMap);
-        hopper = new CarouselSubsystem(hardwareMap);
-        shooter = new ShooterSubsystem(hardwareMap);
+    public void initialize() {
+        SubsystemCollection.deinit();
+        sys = SubsystemCollection.getInstance(hardwareMap);
 
-        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
-    }
+        Gamepad1 = new GamepadEx(gamepad1);
+        Gamepad2 = new GamepadEx(gamepad2);
 
-    @Override
-    public void loop() {
-        // Variables to store the x (Left X), y (Left Y, reversed), and angle for turning (Right X).
-        double cX = Gamepad1.getLeftX();
-        double cY = -Gamepad1.getLeftY();
-        double cA = Gamepad1.getRightX();
+        register(sys.drivebase, sys.intake, sys.hopper, sys.shooter);
 
-        // Drive using robot-centric mode, feeding in the controller x, y, and angle.
-        // Heading is set to -1 because the functionality is not implemented, just to
-        // keep it clear.
-        drivebase.Drive(cX, cY, cA, -1);
+        sys.drivebase.setDefaultCommand(new DriveRobotCentricCommand(Gamepad1::getLeftX, Gamepad1::getLeftY, Gamepad1::getRightX));
 
-        if (gamepad1.dpad_up) drivebase.DriveFieldCentric(0, 1, 0, -1);
-        if (gamepad1.dpad_down) drivebase.DriveFieldCentric(0, -1, 0, -1);
-        if (gamepad1.dpad_left) drivebase.DriveFieldCentric(-1, 0, 0, -1);
-        if (gamepad1.dpad_right) drivebase.DriveFieldCentric(1, 0, 0, -1);
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new DriveFieldCentricCommand(0.0, 1.0, 0.0));
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new DriveFieldCentricCommand(0.0, -1.0, 0.0));
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(new DriveFieldCentricCommand(-1.0, 0.0, 0.0));
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whileHeld(new DriveFieldCentricCommand(1.0, 0.0, 0.0));
+
+        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whenPressed(
+                new ConditionalCommand(
+                        new IntakeSetPowerCommand(1.0),
+                        new IntakeSetPowerCommand(0.0),
+                        () -> sys.intake.isIntakeActive
+                )
+        );
     }
 }

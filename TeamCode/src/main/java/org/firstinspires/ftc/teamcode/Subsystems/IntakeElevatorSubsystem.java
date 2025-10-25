@@ -9,15 +9,18 @@ public class IntakeElevatorSubsystem extends SubsystemBase {
     // The motor object for the single motor that controlls the
     // intake and elevator.
     private final MotorEx intakeMotor;
+    public boolean isIntakeActive = false;
 
     public IntakeElevatorSubsystem(HardwareMap map) {
         intakeMotor = map.get(MotorEx.class, "IntakeMotor");
         intakeMotor.setInverted(true);
     }
 
-    /// Turns the intake/elevator system on.
-    public void turnOn() { intakeMotor.set(1.0); }
-
-    /// Turns the intake/elevator system off.
-    public void turnOff() { intakeMotor.set(0.0); }
+    /// Sets the intake to a given speed.
+    /// @param power A double, representing the motor power you want
+    ///              from -1 to 1.
+    public void setPower(double power) {
+        intakeMotor.set(power);
+        isIntakeActive = (power != 0.0);
+    }
 }

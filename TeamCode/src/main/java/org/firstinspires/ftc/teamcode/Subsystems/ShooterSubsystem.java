@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 public class ShooterSubsystem extends SubsystemBase {
-    private final DcMotorEx extakeMotor;
+    private final MotorEx extakeMotor;
 
     // TODO: Tune motor speeds
     public static final class ExtakeSpeeds {
@@ -15,9 +16,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public ShooterSubsystem(HardwareMap map) {
-        extakeMotor = map.get(DcMotorEx.class, "ExtakeMotor");
-        extakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        extakeMotor = map.get(MotorEx.class, "ExtakeMotor");
+        extakeMotor.setInverted(true);
     }
 
-    public void setPower(double speed) { extakeMotor.setPower(speed); }
+    public void setPower(double speed) { extakeMotor.set(speed); }
 }

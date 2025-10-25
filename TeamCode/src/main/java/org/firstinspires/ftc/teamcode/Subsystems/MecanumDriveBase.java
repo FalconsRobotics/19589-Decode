@@ -31,6 +31,11 @@ public class MecanumDriveBase extends SubsystemBase {
         odo.recalibrateIMU();
     }
 
+    /// Functions to be run every loop.
+    public void periodic() {
+        odo.update();
+    }
+
     /// Drive using robot-centric mode. SolversLib does implement this themselves, but I would like
     /// to have some manual control over what is going on for when I add my own funcitonality later.
     /// @param x The x-value, normally taken from the controller joystick inputs, to use to drive.
