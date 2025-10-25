@@ -1,37 +1,50 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import java.util.List;
 
 public class Limelight {
     Limelight3A limelight;
     LLResult result;
+    int id = 0;
     int motif = 0;
 
     public Limelight(HardwareMap map){
         limelight = map.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+        limelight.start();
+        result = limelight.getLatestResult();
+    }
+
+    public void refreshLL(){
         result = limelight.getLatestResult();
     }
 
     //sets motif variable to 1, 2, or 3 depending on id seen
     //if no id is seen, motif is automatically set to 3
-    private void findMotif(){
+    private int findMotif(){
         limelight.pipelineSwitch(0);
-        limelight.getLatestResult();
-        int id;
-        if(result != null && result.isValid()){
+        if(result.isValid() && !result.getFiducialResults().isEmpty()){
             id = result.getFiducialResults().get(0).getFiducialId();
-        } else{
-            id = 0;
         }
         if(id == 21){
             motif = 1;
+            return 1;
         } else if(id == 22){
             motif = 2;
+            return 2;
         } else {
             motif = 3;
+            return 3;
         }
+    }
+
+    public int getPipeline(){
+        return result.getPipelineIndex();
     }
 
     public int getMotif() {
@@ -42,7 +55,7 @@ public class Limelight {
     public double angleToGoalBlue(){
         limelight.pipelineSwitch(1);
         limelight.getLatestResult();
-        if(result != null && result.isValid()){
+        if(!result.getFiducialResults().isEmpty() && result.isValid()){
             return result.getTx();
         } else {
             return 0;
@@ -53,7 +66,7 @@ public class Limelight {
     public double angleToGoalRed(){
         limelight.pipelineSwitch(2);
         limelight.getLatestResult();
-        if(result != null && result.isValid()){
+        if(!result.getFiducialResults().isEmpty() && result.isValid()){
             return result.getTx();
         } else {
             return 0;
@@ -63,6 +76,7 @@ public class Limelight {
     //ballPos returns an x and y value to the closest ball it can see
     //ballPos is an array with index 0 being X & index 1 being Y
     public double[] findClosestBall(){
+        limelight.pipelineSwitch(6);
         double[] llpython = result.getPythonOutput();
         double[] ballPos = new double[2];
 

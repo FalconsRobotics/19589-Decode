@@ -9,16 +9,20 @@ import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
 public class LimelightTesting extends LinearOpMode {
     Limelight ll;
 
+
     public void runOpMode() {
         ll = new Limelight(hardwareMap);
 
         while (opModeInInit()) {}
 
         while (opModeIsActive()) {
-            telemetry.addData("Motif (int)", ll.getMotif());
+           // telemetry.addData("Motif (int)", ll.getMotif());
+            telemetry.addData("Pipeline: ", ll.getPipeline());
             telemetry.addData("Angle to Blue", ll.angleToGoalBlue());
             telemetry.addData("Angle to Red", ll.angleToGoalRed());
+            telemetry.addData("Closest ball: ", ll.findClosestBall());
             telemetry.update();
+            ll.refreshLL();
 
         }
 
