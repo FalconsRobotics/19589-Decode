@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Old;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
-import org.firstinspires.ftc.teamcode.Constants.DriveConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +20,18 @@ public class SwerveSubsystem {
     public GoBildaPinpointDriver odo;
     private HardwareMap hardwareMap;
 
-    //publicly used variables set off the bat
-    double powerDir = 1; //Changes the direction of power for the wheels
-    int ticksToMove = 0; //Difference between where you are and need to be for rotating swerve modules in ticks
-    double joyStickAngle = 0; //angle of left joystick to create vector
-    double wheelFlip = 0; //flips the angle of the wheels to account for flipping
-    boolean latch = false, timeLatch = false; //locks functions once activated
-    double lastHeading = 0; //last heading once you let go of joystick for heading correction
+    //Publicly used variables
+    double powerDir = 1; // Changes the direction of power for the wheels
+    int ticksToMove = 0; // Difference between where you are and need to be for rotating swerve modules in ticks
+    double joyStickAngle = 0; // Angle of left joystick to create vector
+    double wheelFlip = 0; // Flips the angle of the wheels to account for flipping
+    boolean latch = false, timeLatch = false; // Locks functions once activated
+    double lastHeading = 0; // Last heading once you let go of joystick for heading correction
     double normalizedIMUBotHeading = 0; //-180 to 180 bot heading
-    double botHeadingVel = 0; //turning velocity
-    double holdDelta = 0; //angle difference between last heading and current heading
+    double botHeadingVel = 0; // Turning velocity
+    double holdDelta = 0; // Angle difference between last heading and current heading
 
-    //TODO: look  over auto variables
+    //TODO: look over auto variables
     double oldTime = 0;
 
     int currentPointIndex = 0;
@@ -44,17 +43,14 @@ public class SwerveSubsystem {
     double error = 0;
     double targetTime = 0, deltaTime = 0;
 
-    //function to map hardware called on init
-    public void mapHardware(HardwareMap map){
+    public SwerveSubsystem(HardwareMap map){
         this.hardwareMap = map;
         steeringMotor = hardwareMap.get(DcMotor.class, "SteeringMotor");
         driveA = hardwareMap.get(DcMotor.class, "LeftMotor");
         driveB = hardwareMap.get(DcMotor.class, "RightMotor");
         driveC = hardwareMap.get(DcMotor.class, "BackMotor");
-        // Reverse motors if needed
-//        driveC.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        //odometry initialization
+        // Odometry initialization
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         odo.setOffsets(-84.0, -168.0, DistanceUnit.MM);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -64,11 +60,40 @@ public class SwerveSubsystem {
         odo.resetPosAndIMU();
         odo.recalibrateIMU();
 
-        //steering motor settings
+        // Steering motor settings
         steeringMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         steeringMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //enables auto bulk reads to speed up code
+        // Enables auto bulk reads to speed up code
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+    }
+
+    // function to map hardware called on init
+    public void mapHardware(HardwareMap map){
+        this.hardwareMap = map;
+        steeringMotor = hardwareMap.get(DcMotor.class, "SteeringMotor");
+        driveA = hardwareMap.get(DcMotor.class, "LeftMotor");
+        driveB = hardwareMap.get(DcMotor.class, "RightMotor");
+        driveC = hardwareMap.get(DcMotor.class, "BackMotor");
+
+        // Odometry initialization
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        odo.setOffsets(-84.0, -168.0, DistanceUnit.MM);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.resetPosAndIMU();
+        odo.recalibrateIMU();
+
+        // Steering motor settings
+        steeringMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        steeringMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Enables auto bulk reads to speed up code
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
@@ -81,8 +106,8 @@ public class SwerveSubsystem {
     public double getY(){
         return -odo.getPosY(DistanceUnit.INCH);
     }
-    public double getLoopTime(double newTime){ //input getRunTime() function to this
-        //calculation to get code loop times
+    public double getLoopTime(double newTime){ // input getRunTime() function to this
+        // Calculation to get code loop times
         double loopTime = newTime-oldTime;
         double frequency = 1/loopTime;
         oldTime = newTime;
@@ -108,24 +133,24 @@ public class SwerveSubsystem {
 
         botHeadingVel = Math.abs(odo.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS));
 
-        //rotated x and y variables to allow for field centric driving
-        //joystick inputs transformed to robot coordinates for field centric driving
+        // Rotated x and y variables to allow for field centric driving
+        // Joystick inputs transformed to robot coordinates for field centric driving
         double rotX = joyStickX * Math.cos(IMUBotHeadingRad) - joyStickY * Math.sin(IMUBotHeadingRad);
         double rotY = joyStickX * Math.sin(IMUBotHeadingRad) + joyStickY * Math.cos(IMUBotHeadingRad);
 
-        //power for the wheels based off the magnitude of the joysticks movement then making sure it doesnt go above 1
+        // Power for the wheels based off the magnitude of the joysticks movement then making sure it doesnt go above 1
         double power = Math.sqrt((joyStickX * joyStickX)+(joyStickY * joyStickY)); //TODO check if these want to be rotX/Y
         if(power > 1) power = 1;
 
-        //angle of the joystick calculation and then normalize angle of joystick to be in 0 to 360 degrees
+        // Angle of the joystick calculation and then normalize angle of joystick to be in 0 to 360 degrees
         if(joyStickX != 0 || joyStickY != 0) joyStickAngle = Math.toDegrees(Math.atan2(rotX, rotY));
         if (joyStickAngle < 0) joyStickAngle += 360;
 
-        //if joysticks are sitting still set power for steering motor to 0 to conserve power
+        // If joysticks are sitting still set power for steering motor to 0 to conserve power
         if (joyStickX <= 0.05 && joyStickY <= 0.05 &&  ticksToMove < 15) steeringMotor.setPower(0);
 
         //TODO: tune heading velocity constraint, strength and fix constant spinning
-        //correction so if not moving right joystick it holds heading to account for drift
+        // Correction so if not moving right joystick it holds heading to account for drift
         if (Math.abs(joyStickRotation) <= 0.05){
             if(!latch && botHeadingVel < 0.2 * DriveConstants.powerMult){
                 lastHeading = normalizedIMUBotHeading;
@@ -137,22 +162,22 @@ public class SwerveSubsystem {
             }
         }else latch = false;
 
-        //current swerve module angle calculation
+        // Current swerve module angle calculation
         double unnormalizedWheelAngle = (steeringMotor.getCurrentPosition() / (DriveConstants.ticksPerRev * DriveConstants.gearRatio)) * 360;
 
-        //current swerve module angle normalized to -180 to 180
+        // Current swerve module angle normalized to -180 to 180
         double currentWheelAngle = normalizeTo180(unnormalizedWheelAngle);
 
-        //current swerve module angle as seen by robot with flip correction in a -360 to 360
+        // Current swerve module angle as seen by robot with flip correction in a -360 to 360
         double flippedWheelAngle = unnormalizedWheelAngle + wheelFlip;
         flippedWheelAngle %= 360;
 
 
-        //difference between current wheel angle and target wheel angle
+        // Difference between current wheel angle and target wheel angle
         double angleDelta = normalizeTo180(joyStickAngle - flippedWheelAngle);
         wheelFlip %= 360;
 
-        //if difference in angles is too large flips direction of wheels so the turning is more efficient
+        // If difference in angles is too large flips direction of wheels so the turning is more efficient
         if(Math.abs(angleDelta) >= DriveConstants.flipPoint){
             wheelFlip += 180 * Math.signum(angleDelta);
             powerDir *= -1;

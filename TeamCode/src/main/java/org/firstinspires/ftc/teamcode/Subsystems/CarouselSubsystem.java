@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.ColorDriver;
 
-public class Carousel {
+public class CarouselSubsystem {
     private Servo carousel;
     private RevColorSensorV3 sensor;
     public ColorDriver led;
@@ -55,7 +55,7 @@ public class Carousel {
     public Ball ball1, ball2, ball3;
 
     /// Initialize Carousel Components with Constructors
-    public Carousel(HardwareMap map) {
+    public CarouselSubsystem(HardwareMap map) {
         sensor = map.get(RevColorSensorV3.class, "distance-sensor");
         pos = map.get(AnalogInput.class, "carousel-pos");
         carousel = map.get(Servo.class, "new");
