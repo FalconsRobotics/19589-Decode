@@ -1,19 +1,29 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.ToggleButtonReader;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
-public class ControllerSubsystem {
+public class Controller {
     public GamepadEx base, util;
+    public ToggleButtonReader toggleButton;
 
-    public ControllerSubsystem(Gamepad control1, Gamepad control2) {
+    public Controller(Gamepad control1, Gamepad control2) {
         this.base = new GamepadEx(control1);
         this.util = new GamepadEx(control2);
+
+        this.toggleButton = new ToggleButtonReader(this.base, GamepadKeys.Button.A);
     }
 
     public void initController(Gamepad control1, Gamepad control2) {
         this.base = new GamepadEx(control1);
         this.util = new GamepadEx(control2);
+    }
+
+    public void readControllers() {
+        this.base.readButtons();
+        this.util.readButtons();
     }
 
     public void initBaseControl(Gamepad control) {this.base = new GamepadEx(control);}

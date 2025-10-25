@@ -1,20 +1,23 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Color.ColorDriver;
-import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.ColorDriver;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.LED;
+import org.firstinspires.ftc.teamcode.Subsystems.Controller;
 
-@TeleOp (name = "LED Testing 10/08/25", group = "Test")
+
+//@TeleOp (name = "LED Testing 10/08/25", group = "Test")
+@Disabled
 public class TestLED extends LinearOpMode {
     public ColorDriver led;
-    ControllerSubsystem control;
+    Controller control;
     double colorTracker = Color.MIN;
-    ControllerSubsystem.Toggle allMode;
+    Controller.Toggle allMode;
     Color.Pattern.CyclicGradient gradientCycle = new Color.Pattern.CyclicGradient(Color.RED);
     Color.Pattern.StraightGradient gradientStraight = new Color.Pattern.StraightGradient(Color.RED);
     Color.Pattern.Flash flashPattern = new Color.Pattern.Flash(Color.WHITE);
@@ -22,8 +25,8 @@ public class TestLED extends LinearOpMode {
 
     public void runOpMode() {
         led = new ColorDriver(hardwareMap);
-        control = new ControllerSubsystem(gamepad1,gamepad2);
-        allMode = new ControllerSubsystem.Toggle(true);
+        control = new Controller(gamepad1,gamepad2);
+        allMode = new Controller.Toggle(true);
         String debug = "null";
 
         while (opModeInInit()) {

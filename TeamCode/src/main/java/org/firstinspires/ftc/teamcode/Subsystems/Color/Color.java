@@ -145,5 +145,85 @@ public class Color {
         }
     }
 
+    /// ColorSensor
+    public static enum BallColor {
+        GREEN, PURPLE, NULL
+    }
+    public static boolean withinRange(int in, int min, int max) {
+        if (in >= min && in <= max) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    public static class RGB {
+        public int R, G, B;
 
+        public RGB(int Ri, int Gi, int Bi) {
+            this.R = Ri; this.G = Gi; this.B = Bi;
+        }
+        public void setRGB(int r, int g, int b) {
+            this.R = r; this.G = g; this.B = b;
+        }
+        public void setR(int r) {
+            this.R = r;
+        }
+        public void setG(int g) {
+            this.G = g;
+        }
+        public void setB(int b) {
+            this.B = b;
+        }
+        public int getR() {
+            return this.R;
+        }
+        public int getG() {
+            return this.G;
+        }
+        public int getB() {
+            return this.B;
+        }
+
+
+    }
+    public static class P {
+        public static int RMIN = 60;//70
+        public static int RMAX = 112;//102
+        public static int GMIN = 95;//100
+        public static int GMAX = 143;//133
+        public static int BMIN = 95;//105
+        public static int BMAX = 163;//153
+    }
+    public static class G {
+        public static int RMIN = 32;//47
+        public static int RMAX = 75;//63
+        public static int GMIN = 100;//123
+        public static int GMAX = 240;//183
+        public static int BMIN = 78;//88
+        public static int BMAX = 160;//140
+    }
+
+    public static BallColor detectColor(RGB input) {
+        if (withinRange(input.R, P.RMIN, P.RMAX) && withinRange(input.G, P.GMIN, P.GMAX) && withinRange(input.B, P.BMIN, P.BMAX)) {
+            return BallColor.PURPLE;
+        }
+        else if (withinRange(input.R, G.RMIN, G.RMAX) && withinRange(input.G, G.GMIN, G.GMAX) && withinRange(input.B, G.BMIN, G.BMAX)) {
+            return BallColor.GREEN;
+        }
+        else {
+            return BallColor.NULL;
+        }
+    }
+    public static BallColor detectColor(int r, int g, int b) {
+        if (withinRange(r, P.RMIN, P.RMAX) && withinRange(g, P.GMIN, P.GMAX) && withinRange(b, P.BMIN, P.BMAX)) {
+            return BallColor.PURPLE;
+        }
+        else if (withinRange(r, G.RMIN, G.RMAX) && withinRange(g, G.GMIN, G.GMAX) && withinRange(b, G.BMIN, G.BMAX)) {
+            return BallColor.GREEN;
+        }
+        else {
+            return BallColor.NULL;
+        }
+    }
 }

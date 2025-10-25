@@ -4,67 +4,82 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
+import org.firstinspires.ftc.teamcode.Subsystems.Controller;
 import org.firstinspires.ftc.teamcode.Subsystems.Carousel;
-import org.firstinspires.ftc.teamcode.Constants.CarouselConstants;
+import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 
-@TeleOp(name = "Carousel Test - Nico", group = "Test")
+@TeleOp(name = "Carousel Test - Nico")
 public class TestAxonCarousel extends LinearOpMode {
-    public ControllerSubsystem control;
+    public Controller control;
     public Carousel carousel;
-    public double carouselPower = 0;
 
     public void runOpMode() {
-        control = new ControllerSubsystem(gamepad1, gamepad2);
+        control = new Controller(gamepad1, gamepad2);
         carousel = new Carousel(hardwareMap);
-        ControllerSubsystem.Toggle nextBall = new ControllerSubsystem.Toggle(false);
-        boolean ballDetected = false;
-        double errorOutput = 0;
-        double newOutput = 0;
+
+        Controller.Toggle autoMode = new Controller.Toggle(false);
+        Controller.Toggle nextBall = new Controller.Toggle(false);
+        Color.RGB rgb = new Color.RGB(0,0,0);
+        Color.BallColor ballColor = Color.BallColor.NULL;
+
+        int ballsInCounter = 0;
 
         while(opModeInInit()){
-            if (control.base.isDown(GamepadKeys.Button.DPAD_LEFT)) {carousel.setInOne(true);}
-            if (control.base.isDown(GamepadKeys.Button.DPAD_DOWN)) {carousel.setInTwo(true);}
-            if (control.base.isDown(GamepadKeys.Button.DPAD_RIGHT)) {carousel.setInThree(true);}
-
-            carousel.setPower(0);
+            carousel.toPos(CarouselPosition.inputMin);
         }
 
         while (opModeIsActive()) {
+            control.readControllers();
+            carousel.updateColors();
+            rgb.setRGB(carousel.colorSensorRed(), carousel.colorSensorGreen(), carousel.colorSensorBlue());
             double distance = carousel.getDistance();
-            double position = carousel.getPower();
-            double positionInt = carousel.getPosInt();
 
-            if (control.base.isDown(GamepadKeys.Button.X)) {
-                errorOutput = carousel.toPosReturn(CarouselConstants.input1);
+            //if (control.base.wasJustPressed(GamepadKeys.Button.START)) {autoMode.toggle();}
+
+            if (control.base.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                carousel.setCounter(carousel.getCounter() + 1);
+                carousel.updateBalls();
+            } else if (control.base.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                carousel.setCounter(carousel.getCounter() - 1);
+            } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                carousel.toPos(1);
+            } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                carousel.toPos(0.2);
             }
-            else if (control.base.isDown(GamepadKeys.Button.A)) {
-                errorOutput = carousel.toPosReturn(CarouselConstants.input2);
-            }
-            else if (control.base.isDown(GamepadKeys.Button.B)) {
-                errorOutput = carousel.toPosReturn(CarouselConstants.input3);
-            }
-            else if (control.base.isDown(GamepadKeys.Button.DPAD_UP)) {
-                errorOutput = carousel.toPosReturn(1);
-            }
-            else if (control.base.isDown(GamepadKeys.Button.DPAD_DOWN)) {
-                errorOutput = carousel.toPosReturn(0);
+
+            carousel.toPos(CarouselPosition.servoPosition(carousel.getCounter()));
+
+            if (distance <= CarouselPosition.distanceMax) {
+                ballColor = Color.detectColor(rgb);
             }
             else {
-                errorOutput = carousel.toPosReturn(0.5);
+                ballColor = Color.BallColor.NULL;
             }
 
+            if (nextBall.isTrue()) {
 
-            telemetry.addData("Pos (V)", carousel.getPos());
-            telemetry.addData("New Pos", newOutput);
-            telemetry.addData("Power (Raw)", carousel.getPower());
-            telemetry.addData("Error", errorOutput);
+            }
+
+            telemetry.addData("AutoMode", autoMode.isTrue());
             telemetry.addLine("----------");
-            telemetry.addData("Position (Servo)", position);
-            telemetry.addData("nextBall", nextBall.isTrue());
+            telemetry.addData("Pos (Servo)", carousel.getPosDouble());
+            telemetry.addData("Carousel Counter", carousel.getCounter());
+            telemetry.addLine("----------");
+            telemetry.addData("Position Equation", CarouselPosition.servoPosition(carousel.getCounter()));
             telemetry.addLine("----------");
             telemetry.addData("Distance (MM", distance);
+            telemetry.addLine("----------");
+            telemetry.addData("Detected Color", ballColor);
+            telemetry.addData("R", rgb.getR());
+            telemetry.addData("G", rgb.getG());
+            telemetry.addData("B", rgb.getB());
+            telemetry.addLine("----------");
+            telemetry.addData("Ball 1 Color", carousel.ball1.color);
+            telemetry.addData("Ball 2 Color", carousel.ball2.color);
+            telemetry.addData("Ball 3 Color", carousel.ball3.color);
             telemetry.update();
+
         }
     }
 }
