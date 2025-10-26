@@ -40,10 +40,10 @@ public class Controller {
             return this.toggled;
         }
         public void toggle() {
-            if (this.toggled == true) {
+            if (this.toggled) {
                 this.setFalse();
             }
-            else if (this.toggled == false) {
+            else {
                 this.setTrue();
             }
         }
