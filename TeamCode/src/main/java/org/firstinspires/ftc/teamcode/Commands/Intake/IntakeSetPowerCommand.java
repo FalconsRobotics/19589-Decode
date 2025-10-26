@@ -16,7 +16,7 @@ public class IntakeSetPowerCommand extends InstantCommand {
 
         this.power = power;
 
-        addRequirements(sys.intake);
+//        addRequirements(sys.intake);
     }
 
     public void initialize() {

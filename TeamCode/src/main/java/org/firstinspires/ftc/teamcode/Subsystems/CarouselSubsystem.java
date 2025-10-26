@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.ColorDriver;
 
-public class CarouselSubsystem extends SubsystemBase {
+public class CarouselSubsystem {
     private Servo carousel;
     private RevColorSensorV3 sensor;
     public ColorDriver led;

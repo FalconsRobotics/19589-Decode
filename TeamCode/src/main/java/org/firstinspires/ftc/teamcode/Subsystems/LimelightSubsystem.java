@@ -1,19 +1,16 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.util.List;
-
-public class Limelight {
+public class LimelightSubsystem {
     Limelight3A limelight;
     LLResult result;
     int id = 0;
     int motif = 0;
 
-    public Limelight(HardwareMap map){
+    public LimelightSubsystem(HardwareMap map){
         limelight = map.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();

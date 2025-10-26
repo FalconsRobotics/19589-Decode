@@ -1,46 +1,36 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.ConditionalCommand;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Commands.Drivebase.DriveFieldCentricCommand;
-import org.firstinspires.ftc.teamcode.Commands.Drivebase.DriveRobotCentricCommand;
-import org.firstinspires.ftc.teamcode.Commands.Intake.IntakeSetPowerCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.SubsystemCollection;
 
-@TeleOp(name = "Main")
-public class Main extends CommandOpMode {
-    private SubsystemCollection sys;
-
-    private GamepadEx Gamepad1;
-    private GamepadEx Gamepad2;
+public class Main extends OpMode {
+    SubsystemCollection sys;
 
     @Override
-    public void initialize() {
+    public void init() {
         SubsystemCollection.deinit();
         sys = SubsystemCollection.getInstance(hardwareMap);
+    }
 
-        Gamepad1 = new GamepadEx(gamepad1);
-        Gamepad2 = new GamepadEx(gamepad2);
+    @Override
+    public void loop() {
+        sys.periodic();
 
-        register(sys.drivebase, sys.intake, sys.hopper, sys.shooter);
+        double cX = gamepad1.left_stick_x;
+        double cY = -gamepad1.left_stick_y;
+        double cA = gamepad1.right_stick_x;
 
-        sys.drivebase.setDefaultCommand(new DriveRobotCentricCommand(Gamepad1::getLeftX, Gamepad1::getLeftY, Gamepad1::getRightX));
+        sys.drivebase.Drive(cX, cY, cA, -1);
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new DriveFieldCentricCommand(0.0, 1.0, 0.0));
-        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new DriveFieldCentricCommand(0.0, -1.0, 0.0));
-        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(new DriveFieldCentricCommand(-1.0, 0.0, 0.0));
-        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whileHeld(new DriveFieldCentricCommand(1.0, 0.0, 0.0));
+        if (gamepad1.dpad_up) sys.drivebase.DriveFieldCentric(0, 1, 0, -1);
+        if (gamepad1.dpad_down) sys.drivebase.DriveFieldCentric(0, -1, 0, -1);
+        if (gamepad1.dpad_left) sys.drivebase.DriveFieldCentric(-1, 0, 0, -1);
+        if (gamepad1.dpad_right) sys.drivebase.DriveFieldCentric(1, 0, 0, -1);
+    }
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whenPressed(
-                new ConditionalCommand(
-                        new IntakeSetPowerCommand(1.0),
-                        new IntakeSetPowerCommand(0.0),
-                        () -> sys.intake.isIntakeActive
-                )
-        );
+    @Override
+    public void stop() {
+
     }
 }
