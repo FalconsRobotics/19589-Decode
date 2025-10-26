@@ -1,48 +1,46 @@
-
 package org.firstinspires.ftc.teamcode.OpModes;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Subsystems.SwerveSubsystem;
-import org.firstinspires.ftc.teamcode.Constants.DriveConstants;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.ConditionalCommand;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+
+import org.firstinspires.ftc.teamcode.Commands.Drivebase.DriveFieldCentricCommand;
+import org.firstinspires.ftc.teamcode.Commands.Drivebase.DriveRobotCentricCommand;
+import org.firstinspires.ftc.teamcode.Commands.Intake.IntakeSetPowerCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.SubsystemCollection;
 
 @TeleOp(name = "Main")
-public class Main extends OpMode {
+public class Main extends CommandOpMode {
+    private SubsystemCollection sys;
 
-    boolean toggle = false;
-    private SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-
-    @Override
-    public void init() {
-        //initializing all hardware
-        swerveSubsystem.mapHardware(hardwareMap);
-        DriveConstants.powerMult = 1;
-    }
+    private GamepadEx Gamepad1;
+    private GamepadEx Gamepad2;
 
     @Override
-    public void loop() {
-        //variables to store the joystick positions
-        double x = -gamepad1.left_stick_x;
-        double y = -gamepad1.left_stick_y;
-        double a = -gamepad1.right_stick_x;
+    public void initialize() {
+        SubsystemCollection.deinit();
+        sys = SubsystemCollection.getInstance(hardwareMap);
 
-        swerveSubsystem.Drive(x,y,a, -1);
+        Gamepad1 = new GamepadEx(gamepad1);
+        Gamepad2 = new GamepadEx(gamepad2);
 
-        if(Math.abs(gamepad1.right_stick_x) > 0.05) swerveSubsystem.Drive(x,y,a,-1);
-        else if(gamepad1.dpad_up) swerveSubsystem.Drive(x,y,a,0);
-        else if(gamepad1.dpad_left) swerveSubsystem.Drive(x,y,a,90);
-        else if(gamepad1.dpad_down) swerveSubsystem.Drive(x,y,a,180);
-        else if(gamepad1.dpad_right) swerveSubsystem.Drive(x,y,a,270);
+        register(sys.drivebase, sys.intake, sys.hopper, sys.shooter);
 
-        telemetry.addData("Power:", DriveConstants.powerMult); //right -y
-        telemetry.addData("Velocity:", swerveSubsystem.odo.getVelY(DistanceUnit.MM)); //right -y
-        telemetry.addData("Update Time:", swerveSubsystem.getLoopTime(getRuntime()));
-        telemetry.update();
-    }
+        sys.drivebase.setDefaultCommand(new DriveRobotCentricCommand(Gamepad1::getLeftX, Gamepad1::getLeftY, Gamepad1::getRightX));
 
-    @Override
-    public void stop(){
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_UP).whileHeld(new DriveFieldCentricCommand(0.0, 1.0, 0.0));
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileHeld(new DriveFieldCentricCommand(0.0, -1.0, 0.0));
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(new DriveFieldCentricCommand(-1.0, 0.0, 0.0));
+        Gamepad1.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whileHeld(new DriveFieldCentricCommand(1.0, 0.0, 0.0));
 
+        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whenPressed(
+                new ConditionalCommand(
+                        new IntakeSetPowerCommand(1.0),
+                        new IntakeSetPowerCommand(0.0),
+                        () -> sys.intake.isIntakeActive
+                )
+        );
     }
 }

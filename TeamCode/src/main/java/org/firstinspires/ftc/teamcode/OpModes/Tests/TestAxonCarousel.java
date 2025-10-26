@@ -6,17 +6,17 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
 import org.firstinspires.ftc.teamcode.Subsystems.Controller;
-import org.firstinspires.ftc.teamcode.Subsystems.Carousel;
+import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 
 @TeleOp(name = "Carousel Test - Nico")
 public class TestAxonCarousel extends LinearOpMode {
     public Controller control;
-    public Carousel carousel;
+    public CarouselSubsystem carousel;
 
     public void runOpMode() {
         control = new Controller(gamepad1, gamepad2);
-        carousel = new Carousel(hardwareMap);
+        carousel = new CarouselSubsystem(hardwareMap);
 
         Controller.Toggle autoMode = new Controller.Toggle(false);
         Controller.Toggle nextBall = new Controller.Toggle(false);
