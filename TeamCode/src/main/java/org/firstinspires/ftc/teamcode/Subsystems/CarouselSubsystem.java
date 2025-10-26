@@ -94,23 +94,21 @@ public class CarouselSubsystem {
     }
     public void updateBalls() {
         if (atPosInt(1)) {
-            this.ball1.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
-            this.ball1.setPosition(1);
+            this.ball3.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
+            this.ball3.setPosition(1);
         }
         else if (atPosInt(2)) {
-            this.ball2.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
-            this.ball2.setPosition(2);
+            this.ball1.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
+            this.ball1.setPosition(2);
         }
         else if (atPosInt(3)) {
-            this.ball3.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
-            this.ball3.setPosition(3);
+            this.ball2.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
+            this.ball2.setPosition(3);
         }
 
     }
     public void updateColors() {
-        double b1c = Color.WHITE;
-        double b2c = Color.WHITE;
-        double b3c = Color.WHITE;
+        double b1c, b2c, b3c;
 
         if (ball1.color == Color.BallColor.GREEN) {
             b1c = Color.BALL_GREEN;
@@ -118,7 +116,7 @@ public class CarouselSubsystem {
         else if (ball1.color == Color.BallColor.PURPLE) {
             b1c = Color.BALL_PURPLE;
         }
-        else b1c = Color.WHITE;
+        else b1c = Color.RED;
 
         if (ball2.color == Color.BallColor.GREEN) {
             b2c = Color.BALL_GREEN;
@@ -126,7 +124,7 @@ public class CarouselSubsystem {
         else if (ball2.color == Color.BallColor.PURPLE) {
             b2c = Color.BALL_PURPLE;
         }
-        else b2c = Color.WHITE;
+        else b2c = Color.RED;
 
         if (ball3.color == Color.BallColor.GREEN) {
             b3c = Color.BALL_GREEN;
@@ -134,7 +132,7 @@ public class CarouselSubsystem {
         else if (ball3.color == Color.BallColor.PURPLE) {
             b3c = Color.BALL_PURPLE;
         }
-        else b3c = Color.WHITE;
+        else b3c = Color.RED;
 
         led.setLED0(b1c);
         led.setLED1(b2c);

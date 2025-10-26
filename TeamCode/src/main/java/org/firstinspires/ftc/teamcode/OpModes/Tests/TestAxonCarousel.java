@@ -26,7 +26,7 @@ public class TestAxonCarousel extends LinearOpMode {
         int ballsInCounter = 0;
 
         while(opModeInInit()){
-            carousel.toPos(CarouselPosition.inputMin);
+
         }
 
         while (opModeIsActive()) {
@@ -43,9 +43,9 @@ public class TestAxonCarousel extends LinearOpMode {
             } else if (control.base.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 carousel.setCounter(carousel.getCounter() - 1);
             } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                carousel.toPos(1);
+                carousel.setCounter(11);
             } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                carousel.toPos(0.2);
+                carousel.setCounter(0);
             }
 
             carousel.toPos(CarouselPosition.servoPosition(carousel.getCounter()));

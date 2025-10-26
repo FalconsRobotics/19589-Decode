@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Color;
 
+import com.acmerobotics.dashboard.config.Config;
+
 public class Color {
     /// Spectrum: 0.277 - 0.722 ( > 0.722 is White)
     public static double RED = 0.28;
@@ -187,14 +189,16 @@ public class Color {
 
 
     }
+    @Config
     public static class P {
         public static int RMIN = 60;//70
-        public static int RMAX = 112;//102
-        public static int GMIN = 95;//100
-        public static int GMAX = 143;//133
-        public static int BMIN = 95;//105
-        public static int BMAX = 163;//153
+        public static int RMAX = 130;//102
+        public static int GMIN = 70;//100
+        public static int GMAX = 180;//133
+        public static int BMIN = 80;//105
+        public static int BMAX = 200;//153
     }
+    @Config
     public static class G {
         public static int RMIN = 32;//47
         public static int RMAX = 75;//63
