@@ -7,13 +7,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 public class Controller {
     public GamepadEx base, util;
-    public ToggleButtonReader toggleButton;
 
     public Controller(Gamepad control1, Gamepad control2) {
         this.base = new GamepadEx(control1);
         this.util = new GamepadEx(control2);
-
-        this.toggleButton = new ToggleButtonReader(this.base, GamepadKeys.Button.A);
     }
 
     public void initController(Gamepad control1, Gamepad control2) {

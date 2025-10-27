@@ -7,14 +7,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
+import org.firstinspires.ftc.teamcode.Constants.HopperPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
-import org.firstinspires.ftc.teamcode.Subsystems.Color.ColorDriver;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.LedSubsystem;
 
-public class CarouselSubsystem extends SubsystemBase {
+public class HopperSubsystem extends SubsystemBase {
     private Servo carousel;
     private RevColorSensorV3 sensor;
-    public ColorDriver led;
+    public LedSubsystem led;
     private AnalogInput pos;
     private int counter;
     public boolean inOne, inTwo, inThree;
@@ -56,11 +56,11 @@ public class CarouselSubsystem extends SubsystemBase {
     public Ball ball1, ball2, ball3;
 
     /// Initialize Carousel Components with Constructors
-    public CarouselSubsystem(HardwareMap map) {
+    public HopperSubsystem(HardwareMap map) {
         sensor = map.get(RevColorSensorV3.class, "distance-sensor");
         pos = map.get(AnalogInput.class, "carousel-pos");
         carousel = map.get(Servo.class, "new");
-        led = new ColorDriver(map);
+        led = new LedSubsystem(map);
 
         carousel.setDirection(Servo.Direction.REVERSE);
 
@@ -154,8 +154,8 @@ public class CarouselSubsystem extends SubsystemBase {
 
     /// Keeps the Servo within bounds (run in main loop)
     public void limitCounter() {
-        if (this.counter < CarouselPosition.counterMin) {this.counter = CarouselPosition.counterMin;}
-        else if (this.counter > CarouselPosition.counterMax) {this.counter = CarouselPosition.counterMax;}
+        if (this.counter < HopperPosition.counterMin) {this.counter = HopperPosition.counterMin;}
+        else if (this.counter > HopperPosition.counterMax) {this.counter = HopperPosition.counterMax;}
     }
 
     /// Returns distance from Color Sensor

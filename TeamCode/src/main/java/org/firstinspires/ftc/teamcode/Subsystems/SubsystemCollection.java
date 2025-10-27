@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Color.LedSubsystem;
+
 import java.security.InvalidParameterException;
 
 public class SubsystemCollection {
@@ -10,16 +12,18 @@ public class SubsystemCollection {
 
     public final MecanumDriveBase drivebase;
     public final IntakeElevatorSubsystem intake;
-    public final CarouselSubsystem hopper;
+    public final HopperSubsystem hopper;
     public final ShooterSubsystem shooter;
+    public final LedSubsystem led;
 
     private SubsystemCollection(HardwareMap map) {
         this.map = map;
 
         drivebase = new MecanumDriveBase(this.map);
         intake = new IntakeElevatorSubsystem(this.map);
-        hopper = new CarouselSubsystem(this.map);
+        hopper = new HopperSubsystem(this.map);
         shooter = new ShooterSubsystem(this.map);
+        led = new LedSubsystem(this.map);
     }
 
     public static SubsystemCollection getInstance(HardwareMap map) {

@@ -4,19 +4,19 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Constants.HopperPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
 import org.firstinspires.ftc.teamcode.Subsystems.Controller;
-import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
-import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
+import org.firstinspires.ftc.teamcode.Subsystems.HopperSubsystem;
 
-@TeleOp(name = "Carousel Test - Nico")
-public class TestAxonCarousel extends LinearOpMode {
+@TeleOp(name = "Hopper Test - Nico")
+public class TestHopper extends LinearOpMode {
     public Controller control;
-    public CarouselSubsystem carousel;
+    public HopperSubsystem hopper;
 
     public void runOpMode() {
         control = new Controller(gamepad1, gamepad2);
-        carousel = new CarouselSubsystem(hardwareMap);
+        hopper = new HopperSubsystem(hardwareMap);
 
         Controller.Toggle autoMode = new Controller.Toggle(false);
         Controller.Toggle nextBall = new Controller.Toggle(false);
@@ -26,31 +26,32 @@ public class TestAxonCarousel extends LinearOpMode {
         int ballsInCounter = 0;
 
         while(opModeInInit()){
-
+            control.readControllers();
+            if (control.base.wasJustPressed(GamepadKeys.Button.A)) {
+                hopper.toPos(0.2);
+            }
         }
 
         while (opModeIsActive()) {
             control.readControllers();
-            carousel.updateColors();
-            rgb.setRGB(carousel.colorSensorRed(), carousel.colorSensorGreen(), carousel.colorSensorBlue());
-            double distance = carousel.getDistance();
-
-            //if (control.base.wasJustPressed(GamepadKeys.Button.START)) {autoMode.toggle();}
+            hopper.updateColors();
+            rgb.setRGB(hopper.colorSensorRed(), hopper.colorSensorGreen(), hopper.colorSensorBlue());
+            double distance = hopper.getDistance();
 
             if (control.base.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                carousel.setCounter(carousel.getCounter() + 1);
-                carousel.updateBalls();
+                hopper.setCounter(hopper.getCounter() + 1);
+                hopper.updateBalls();
             } else if (control.base.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                carousel.setCounter(carousel.getCounter() - 1);
+                hopper.setCounter(hopper.getCounter() - 1);
             } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                carousel.setCounter(11);
+                hopper.setCounter(11);
             } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                carousel.setCounter(0);
+                hopper.setCounter(0);
             }
 
-            carousel.toPos(CarouselPosition.servoPosition(carousel.getCounter()));
+            hopper.toPos(HopperPosition.servoPosition(hopper.getCounter()));
 
-            if (distance <= CarouselPosition.distanceMax) {
+            if (distance <= HopperPosition.distanceMax) {
                 ballColor = Color.detectColor(rgb);
             }
             else {
@@ -63,10 +64,10 @@ public class TestAxonCarousel extends LinearOpMode {
 
             telemetry.addData("AutoMode", autoMode.isTrue());
             telemetry.addLine("----------");
-            telemetry.addData("Pos (Servo)", carousel.getPosDouble());
-            telemetry.addData("Carousel Counter", carousel.getCounter());
+            telemetry.addData("Pos (Servo)", hopper.getPosDouble());
+            telemetry.addData("Carousel Counter", hopper.getCounter());
             telemetry.addLine("----------");
-            telemetry.addData("Position Equation", CarouselPosition.servoPosition(carousel.getCounter()));
+            telemetry.addData("Position Equation", HopperPosition.servoPosition(hopper.getCounter()));
             telemetry.addLine("----------");
             telemetry.addData("Distance (MM", distance);
             telemetry.addLine("----------");
@@ -75,9 +76,9 @@ public class TestAxonCarousel extends LinearOpMode {
             telemetry.addData("G", rgb.getG());
             telemetry.addData("B", rgb.getB());
             telemetry.addLine("----------");
-            telemetry.addData("Ball 1 Color", carousel.ball1.color);
-            telemetry.addData("Ball 2 Color", carousel.ball2.color);
-            telemetry.addData("Ball 3 Color", carousel.ball3.color);
+            telemetry.addData("Ball 1 Color", hopper.ball1.color);
+            telemetry.addData("Ball 2 Color", hopper.ball2.color);
+            telemetry.addData("Ball 3 Color", hopper.ball3.color);
             telemetry.update();
 
         }
