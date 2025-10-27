@@ -17,7 +17,7 @@ public class DriveRobotCentricCommand extends CommandBase {
         this.y = y.getAsDouble();
         this.a = a.getAsDouble();
 
-        addRequirements(sys.drivebase);
+//        addRequirements(sys.drivebase);
     }
 
     public void execute() {

@@ -8,7 +8,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class MecanumDriveBase extends SubsystemBase {
+public class MecanumDriveBase {
     public MotorEx frontLeft, frontRight, backLeft, backRight;
     public GoBildaPinpointDriver odo;
 
@@ -31,7 +31,7 @@ public class MecanumDriveBase extends SubsystemBase {
         odo.recalibrateIMU();
     }
 
-    /// Functions to be run every loop.
+    /// Functions to be run every loop. For now, we are only updating the odometry.
     public void periodic() {
         odo.update();
     }

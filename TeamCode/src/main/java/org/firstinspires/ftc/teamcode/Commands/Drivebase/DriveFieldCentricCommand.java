@@ -15,7 +15,7 @@ public class DriveFieldCentricCommand extends CommandBase {
         this.y = y;
         this.a = a;
 
-        addRequirements(sys.drivebase);
+//        addRequirements(sys.drivebase);
     }
 
     public void execute() {

@@ -36,6 +36,13 @@ public class SubsystemCollection {
         return instance;
     }
 
+    public void periodic() {
+        drivebase.periodic();
+//        intake.periodic();
+//        hopper.periodic();
+//        shooter.periodic();
+    }
+
     public static void deinit() {
         instance = null;
     }

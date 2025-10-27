@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-public class IntakeElevatorSubsystem extends SubsystemBase {
+public class IntakeElevatorSubsystem {
     // The motor object for the single motor that controlls the
     // intake and elevator.
     private final MotorEx intakeMotor;

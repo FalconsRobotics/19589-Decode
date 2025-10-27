@@ -3,15 +3,15 @@ package org.firstinspires.ftc.teamcode.OpModes.Tests;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Limelight;
+import org.firstinspires.ftc.teamcode.Subsystems.LimelightSubsystem;
 
 @TeleOp(name = "Limelight Testing - Teigan", group = "Test")
 public class LimelightTesting extends LinearOpMode {
-    Limelight ll;
+    LimelightSubsystem ll;
 
 
     public void runOpMode() {
-        ll = new Limelight(hardwareMap);
+        ll = new LimelightSubsystem(hardwareMap);
 
         while (opModeInInit()) {}
 
