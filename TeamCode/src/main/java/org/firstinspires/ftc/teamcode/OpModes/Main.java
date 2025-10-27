@@ -4,6 +4,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.ftccommon.internal.manualcontrol.responses.HubType;
+import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.SubsystemCollection;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class Main extends OpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
+
+        sys.hopper.toPos(CarouselPosition.servoPosition(0));
     }
 
     @Override
@@ -55,6 +58,8 @@ public class Main extends OpMode {
         if (gamepad1.dpad_down) sys.drivebase.DriveFieldCentric(0, -1, 0, -1);
         if (gamepad1.dpad_left) sys.drivebase.DriveFieldCentric(-1, 0, 0, -1);
         if (gamepad1.dpad_right) sys.drivebase.DriveFieldCentric(1, 0, 0, -1);
+
+        if (Gamepad1.)
 
         //endregion
 

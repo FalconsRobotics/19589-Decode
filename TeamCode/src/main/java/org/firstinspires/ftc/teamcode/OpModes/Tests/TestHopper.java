@@ -58,10 +58,6 @@ public class TestHopper extends LinearOpMode {
                 ballColor = Color.BallColor.NULL;
             }
 
-            if (nextBall.isTrue()) {
-
-            }
-
             telemetry.addData("AutoMode", autoMode.isTrue());
             telemetry.addLine("----------");
             telemetry.addData("Pos (Servo)", hopper.getPosDouble());

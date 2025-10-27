@@ -148,10 +148,10 @@ public class Color {
     }
 
     /// ColorSensor
-    public static enum BallColor {
+    public enum BallColor {
         GREEN, PURPLE, NULL
     }
-    public static boolean withinRange(int in, int min, int max) {
+    public static boolean withinSetRange(int in, int min, int max) {
         if (in >= min && in <= max) {
             return true;
         }
@@ -209,10 +209,10 @@ public class Color {
     }
 
     public static BallColor detectColor(RGB input) {
-        if (withinRange(input.R, P.RMIN, P.RMAX) && withinRange(input.G, P.GMIN, P.GMAX) && withinRange(input.B, P.BMIN, P.BMAX)) {
+        if (withinSetRange(input.R, P.RMIN, P.RMAX) && withinSetRange(input.G, P.GMIN, P.GMAX) && withinSetRange(input.B, P.BMIN, P.BMAX)) {
             return BallColor.PURPLE;
         }
-        else if (withinRange(input.R, G.RMIN, G.RMAX) && withinRange(input.G, G.GMIN, G.GMAX) && withinRange(input.B, G.BMIN, G.BMAX)) {
+        else if (withinSetRange(input.R, G.RMIN, G.RMAX) && withinSetRange(input.G, G.GMIN, G.GMAX) && withinSetRange(input.B, G.BMIN, G.BMAX)) {
             return BallColor.GREEN;
         }
         else {
@@ -220,10 +220,10 @@ public class Color {
         }
     }
     public static BallColor detectColor(int r, int g, int b) {
-        if (withinRange(r, P.RMIN, P.RMAX) && withinRange(g, P.GMIN, P.GMAX) && withinRange(b, P.BMIN, P.BMAX)) {
+        if (withinSetRange(r, P.RMIN, P.RMAX) && withinSetRange(g, P.GMIN, P.GMAX) && withinSetRange(b, P.BMIN, P.BMAX)) {
             return BallColor.PURPLE;
         }
-        else if (withinRange(r, G.RMIN, G.RMAX) && withinRange(g, G.GMIN, G.GMAX) && withinRange(b, G.BMIN, G.BMAX)) {
+        else if (withinSetRange(r, G.RMIN, G.RMAX) && withinSetRange(g, G.GMIN, G.GMAX) && withinSetRange(b, G.BMIN, G.BMAX)) {
             return BallColor.GREEN;
         }
         else {
