@@ -4,19 +4,19 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Constants.HopperPosition;
+import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
 import org.firstinspires.ftc.teamcode.Subsystems.Controller;
-import org.firstinspires.ftc.teamcode.Subsystems.HopperSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 
 @TeleOp(name = "Hopper Test - Nico")
 public class TestHopper extends LinearOpMode {
     public Controller control;
-    public HopperSubsystem hopper;
+    public CarouselSubsystem hopper;
 
     public void runOpMode() {
         control = new Controller(gamepad1, gamepad2);
-        hopper = new HopperSubsystem(hardwareMap);
+        hopper = new CarouselSubsystem(hardwareMap);
 
         Controller.Toggle autoMode = new Controller.Toggle(false);
         Controller.Toggle nextBall = new Controller.Toggle(false);
@@ -49,9 +49,9 @@ public class TestHopper extends LinearOpMode {
                 hopper.setCounter(0);
             }
 
-            hopper.toPos(HopperPosition.servoPosition(hopper.getCounter()));
+            hopper.toPos(CarouselPosition.servoPosition(hopper.getCounter()));
 
-            if (distance <= HopperPosition.distanceMax) {
+            if (distance <= CarouselPosition.distanceMax) {
                 ballColor = Color.detectColor(rgb);
             }
             else {
@@ -67,7 +67,7 @@ public class TestHopper extends LinearOpMode {
             telemetry.addData("Pos (Servo)", hopper.getPosDouble());
             telemetry.addData("Carousel Counter", hopper.getCounter());
             telemetry.addLine("----------");
-            telemetry.addData("Position Equation", HopperPosition.servoPosition(hopper.getCounter()));
+            telemetry.addData("Position Equation", CarouselPosition.servoPosition(hopper.getCounter()));
             telemetry.addLine("----------");
             telemetry.addData("Distance (MM", distance);
             telemetry.addLine("----------");

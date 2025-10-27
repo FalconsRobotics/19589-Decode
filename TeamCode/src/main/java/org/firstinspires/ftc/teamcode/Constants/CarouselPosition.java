@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Constants;
 import com.acmerobotics.dashboard.config.Config;
 
 @Config
-public class HopperPosition {
+public class CarouselPosition {
     public static double gearRatio = 36/40;
 
     /// Values tuned if 1st pickup is 'zeroed' at servo position 0.2

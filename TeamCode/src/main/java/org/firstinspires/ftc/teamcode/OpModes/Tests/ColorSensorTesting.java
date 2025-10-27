@@ -6,19 +6,19 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Controller;
-import org.firstinspires.ftc.teamcode.Subsystems.HopperSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 
 @TeleOp
 public class ColorSensorTesting extends LinearOpMode {
     private FtcDashboard dashboard;
-    public HopperSubsystem hopper;
+    public CarouselSubsystem hopper;
     public Controller control;
     // ... other variables
 
     public void runOpMode() {
 
         dashboard = FtcDashboard.getInstance();
-        hopper = new HopperSubsystem(hardwareMap);
+        hopper = new CarouselSubsystem(hardwareMap);
         control = new Controller(gamepad1, gamepad2);
 
         while (opModeInInit()) {

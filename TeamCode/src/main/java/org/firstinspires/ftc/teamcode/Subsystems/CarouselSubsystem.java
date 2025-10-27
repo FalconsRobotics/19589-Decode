@@ -9,12 +9,12 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
-import org.firstinspires.ftc.teamcode.Subsystems.Color.ColorDriver;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.LEDSubsystem;
 
 public class CarouselSubsystem extends SubsystemBase {
     private Servo carousel;
     private RevColorSensorV3 sensor;
-    public ColorDriver led;
+    public LEDSubsystem led;
     private AnalogInput pos;
     private int counter;
     public boolean inOne, inTwo, inThree;
@@ -60,7 +60,7 @@ public class CarouselSubsystem extends SubsystemBase {
         sensor = map.get(RevColorSensorV3.class, "distance-sensor");
         pos = map.get(AnalogInput.class, "carousel-pos");
         carousel = map.get(Servo.class, "new");
-        led = new ColorDriver(map);
+        led = new LEDSubsystem(map);
 
         carousel.setDirection(Servo.Direction.REVERSE);
 

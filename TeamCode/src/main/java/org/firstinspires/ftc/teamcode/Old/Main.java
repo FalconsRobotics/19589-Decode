@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Subsystems.HopperSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
 
@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
 public class Main extends OpMode {
     private SwerveSubsystem swerve = new SwerveSubsystem(hardwareMap);
     private IntakeElevatorSubsystem intake = new IntakeElevatorSubsystem(hardwareMap);
-    private HopperSubsystem carousel = new HopperSubsystem(hardwareMap);
+    private CarouselSubsystem carousel = new CarouselSubsystem(hardwareMap);
     private ShooterSubsystem extake = new ShooterSubsystem(hardwareMap);
 
     @Override

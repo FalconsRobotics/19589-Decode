@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
-import org.firstinspires.ftc.teamcode.Subsystems.Color.LedSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Color.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.LED;
 import org.firstinspires.ftc.teamcode.Subsystems.Controller;
 
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Controller;
 //@TeleOp (name = "LED Testing 10/08/25", group = "Test")
 @Disabled
 public class TestLED extends LinearOpMode {
-    public LedSubsystem led;
+    public LEDSubsystem led;
     Controller control;
     double colorTracker = Color.MIN;
     Controller.Toggle allMode;
@@ -23,7 +23,7 @@ public class TestLED extends LinearOpMode {
     Color.Pattern.SmoothTo smoothTo = new Color.Pattern.SmoothTo(colorTracker);
 
     public void runOpMode() {
-        led = new LedSubsystem(hardwareMap);
+        led = new LEDSubsystem(hardwareMap);
         control = new Controller(gamepad1,gamepad2);
         allMode = new Controller.Toggle(true);
         String debug = "null";

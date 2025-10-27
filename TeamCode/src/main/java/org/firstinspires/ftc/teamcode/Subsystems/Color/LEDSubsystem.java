@@ -3,10 +3,10 @@ package org.firstinspires.ftc.teamcode.Subsystems.Color;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class LedSubsystem {
+public class LEDSubsystem {
     private Servo LED0,LED1, LED2;
 
-    public LedSubsystem(HardwareMap map) {
+    public LEDSubsystem(HardwareMap map) {
         LED0 = map.get(Servo.class, "led0");
         LED1 = map.get(Servo.class, "led1");
         LED2 = map.get(Servo.class, "led2");
