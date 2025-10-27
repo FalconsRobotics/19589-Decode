@@ -37,6 +37,7 @@ public class CarouselSubsystem {
         }
 
     }
+
     public static class Ball {
         public int position;
         public Color.BallColor color;
@@ -53,6 +54,7 @@ public class CarouselSubsystem {
             this.color = c;
         }
     }
+
     public Ball ball1, ball2, ball3;
 
     /// Initialize Carousel Components with Constructors
@@ -69,6 +71,13 @@ public class CarouselSubsystem {
         this.ball3 = new Ball(3, Color.BallColor.NULL);
 
         this.counter = 0;
+    }
+
+    // Functions to be run every loop.
+    public void periodic() {
+        this.toPos(CarouselPosition.servoPosition(this.getCounter()));
+        this.updateColors();
+        this.updateBalls();
     }
 
     /// Returns Position of Carousel Servo

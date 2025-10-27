@@ -31,7 +31,6 @@ public class TestAxonCarousel extends LinearOpMode {
 
         while (opModeIsActive()) {
             control.readControllers();
-            carousel.updateColors();
             rgb.setRGB(carousel.colorSensorRed(), carousel.colorSensorGreen(), carousel.colorSensorBlue());
             double distance = carousel.getDistance();
 
@@ -47,8 +46,6 @@ public class TestAxonCarousel extends LinearOpMode {
             } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 carousel.setCounter(0);
             }
-
-            carousel.toPos(CarouselPosition.servoPosition(carousel.getCounter()));
 
             if (distance <= CarouselPosition.distanceMax) {
                 ballColor = Color.detectColor(rgb);

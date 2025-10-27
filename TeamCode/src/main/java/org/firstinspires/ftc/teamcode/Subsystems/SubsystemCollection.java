@@ -35,7 +35,7 @@ public class SubsystemCollection {
     public void periodic() {
         drivebase.periodic();
 //        intake.periodic();
-//        hopper.periodic();
+        hopper.periodic();
 //        shooter.periodic();
     }
 
