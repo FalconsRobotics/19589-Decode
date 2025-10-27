@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 public class Controller {
     public GamepadEx base, util;
