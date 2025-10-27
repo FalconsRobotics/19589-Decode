@@ -2,18 +2,13 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 public class Controller {
     public GamepadEx base, util;
-    public ToggleButtonReader toggleButton;
 
     public Controller(Gamepad control1, Gamepad control2) {
         this.base = new GamepadEx(control1);
         this.util = new GamepadEx(control2);
-
-        this.toggleButton = new ToggleButtonReader(this.base, GamepadKeys.Button.A);
     }
 
     public void initController(Gamepad control1, Gamepad control2) {
