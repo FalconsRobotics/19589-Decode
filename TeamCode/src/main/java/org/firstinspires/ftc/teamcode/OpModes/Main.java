@@ -6,24 +6,41 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.Subsystems.SubsystemCollection;
+import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
+import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveBase;
+import org.firstinspires.ftc.teamcode.Subsystems.ShooterSubsystem;
 
 import java.util.List;
 
-@TeleOp(name = "TeleOp", group = "Main")
+@TeleOp(name = "TeleOp - Open Warfare", group = "Main")
 public class Main extends OpMode {
-    SubsystemCollection sys;
+    // Right now, we're not going to use SubsystemCollection, the singleton
+    // that holds all of our subsystem classes, until we start using SolversLib.
+    // SubsystemCollection sys;
+
+    // Objects for each of our subsystems
+    MecanumDriveBase drivebase;
+    IntakeElevatorSubsystem intake;
+    CarouselSubsystem hopper;
+    ShooterSubsystem shooter;
+
+    // Here, we decided to use SolversLib's GamepadEx controller for its
+    // "whenJustPressed()" and "isDown()" functionality to maintain simplicity.
     GamepadEx Gamepad1;
     GamepadEx Gamepad2;
 
     @Override
     public void init() {
-        // A class that contains all of the subsystems.
-        // It is used as a singleton to make sure that every OpMode
-        // and (future) Command references the same subsystem instance.
-        SubsystemCollection.deinit();
-        sys = SubsystemCollection.getInstance(hardwareMap);
+        // Set up the various subsystems.
+        // TODO: When adding commands, add in SubsystemsCollection
+        drivebase = new MecanumDriveBase(hardwareMap);
+        intake = new IntakeElevatorSubsystem(hardwareMap);
+        hopper = new CarouselSubsystem(hardwareMap);
+        shooter = new ShooterSubsystem(hardwareMap);
 
+        // Initialize the Gamepads for use from SolversLib.
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
 
@@ -38,18 +55,20 @@ public class Main extends OpMode {
     public void start() {
         // As soon as the match starts (not when we init, when the match actually starts
         // and we're allowed to move), we want the shooter to get up to speed.
-//        sys.shooter.setPower(1.0);
+        shooter.setPower(ShooterConstants.FIRING_SPEED);
     }
 
     @Override
     public void loop() {
         // Call the periodic functions from the SubsystemCollection
         // class. Functions that need to be run every loop.
-        sys.periodic();
+        drivebase.periodic();
+        hopper.periodic();
+        shooter.periodic();
+
+        // SolversLib requires that we read the gamepad every loop.
         Gamepad1.readButtons();
         Gamepad2.readButtons();
-
-        //region Driver Functions (with Gamepad1)
 
         // Gather joystick values from LX, LY (inverted, so up is forward y),
         // and RX (for turning) on Gamepad1.
@@ -63,42 +82,39 @@ public class Main extends OpMode {
 
         // Robot-centric drive with the joystick inputs from earlier lines.
         // I multiplied by speedMultiplier to allow using the trigger.
-        sys.drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cA * speedMultiplier, -1);
+        drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cA * speedMultiplier, -1);
 
         // Field-centric drive using the D-Pad inputs. Up goes up (y+), left goes left (x-), etc.
         // Maybe should have braces for each case. However, you're never going to press more than
         // one D-Pad input at a time.
-        if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) sys.drivebase.DriveFieldCentric(0, 1, 0, -1);
-        if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) sys.drivebase.DriveFieldCentric(0, -1, 0, -1);
-        if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) sys.drivebase.DriveFieldCentric(-1, 0, 0, -1);
-        if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) sys.drivebase.DriveFieldCentric(1, 0, 0, -1);
+        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_UP)) drivebase.DriveFieldCentric(0, 1, 0, -1);
+        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_DOWN)) drivebase.DriveFieldCentric(0, -1, 0, -1);
+        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_LEFT)) drivebase.DriveFieldCentric(-1, 0, 0, -1);
+        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_RIGHT)) drivebase.DriveFieldCentric(1, 0, 0, -1);
 
-        //endregion
-
-        //region Utility Functions (with Gamepad2)
-
-        // Controls for the hopper. LB cycles it left, RB cycles it right
+        // Controls for the hopper. LB cycles it left, RB cycles it right a single time.
+        // D-Pad down returns it back to zero / the center;
         if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-            sys.hopper.setCounter(sys.hopper.getCounter() - 1);
+            hopper.setCounter(hopper.getCounter() - 1);
         } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-            sys.hopper.setCounter(sys.hopper.getCounter() + 1);
+            hopper.setCounter(hopper.getCounter() + 1);
         } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-            sys.hopper.setCounter(0);
+            hopper.setCounter(0);
         }
 
-        //endregion
+        // If the right trigger is pressed (at least halfway, range doesn't really matter),
+        // make sure the shooter is at the optimal speed or check if the override (left bumper
+        // in this case) is pressed, then shoot all three balls.
+        if (Gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.5) {
+            if (shooter.isInPowerBand() || Gamepad2.isDown(GamepadKeys.Button.LEFT_BUMPER)) {
+                hopper.setCounter(hopper.getCounter() - 3);
+            }
+        }
 
-        //region Telemetry
         telemetry.addLine("------------------------------");
-        telemetry.addData("Counter", sys.hopper.getCounter());
-        telemetry.addData("Servo Position", sys.hopper.getPosDouble());
+        telemetry.addData("Counter", hopper.getCounter());
+        telemetry.addData("Servo Position", hopper.getPosDouble());
         telemetry.addLine("------------------------------");
         telemetry.update();
-        //endregion
-    }
-
-    @Override
-    public void stop() {
-
     }
 }
