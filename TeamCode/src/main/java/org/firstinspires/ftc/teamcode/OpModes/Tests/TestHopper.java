@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
-import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
+import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 
@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 public class TestHopper extends LinearOpMode {
     public ControllerSubsystem control;
     public CarouselSubsystem hopper;
+    public boolean checkColorRan = false;
 
     public void runOpMode() {
         control = new ControllerSubsystem(gamepad1, gamepad2);
@@ -20,8 +21,8 @@ public class TestHopper extends LinearOpMode {
 
         ControllerSubsystem.Toggle autoMode = new ControllerSubsystem.Toggle(false);
         ControllerSubsystem.Toggle nextBall = new ControllerSubsystem.Toggle(false);
-        Color.RGB rgb = new Color.RGB(0,0,0);
-        Color.BallColor ballColor = Color.BallColor.NULL;
+        ColorConstants.RGB rgb = new ColorConstants.RGB(0,0,0);
+        ColorConstants.BallColor ballColor = ColorConstants.BallColor.NULL;
 
         int ballsInCounter = 0;
 
@@ -34,28 +35,36 @@ public class TestHopper extends LinearOpMode {
 
         while (opModeIsActive()) {
             control.readControllers();
-            hopper.updateColors();
+            hopper.updateLEDColors();
             rgb.setRGB(hopper.colorSensorRed(), hopper.colorSensorGreen(), hopper.colorSensorBlue());
             double distance = hopper.getDistance();
 
             if (control.base.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                 hopper.setCounter(hopper.getCounter() + 1);
-                hopper.updateBalls();
-            } else if (control.base.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                hopper.updateBallColors();
+            }
+            else if (control.base.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                 hopper.setCounter(hopper.getCounter() - 1);
-            } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+            }
+            else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                 hopper.setCounter(11);
-            } else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+            }
+            else if (control.base.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
                 hopper.setCounter(0);
             }
 
             hopper.toPos(CarouselPosition.servoPosition(hopper.getCounter()));
 
             if (distance <= CarouselPosition.distanceMax) {
-                ballColor = Color.detectColor(rgb);
+                if (!checkColorRan) {
+                    hopper.updateBallColors();
+                    checkColorRan = true;
+                }
+                ballColor = ColorConstants.detectColor(rgb);
             }
             else {
-                ballColor = Color.BallColor.NULL;
+                checkColorRan = false;
+                ballColor = ColorConstants.BallColor.NULL;
             }
 
             telemetry.addData("AutoMode", autoMode.isTrue());

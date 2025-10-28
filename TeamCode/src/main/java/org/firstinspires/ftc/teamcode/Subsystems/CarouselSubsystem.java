@@ -6,56 +6,40 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
-import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
-import org.firstinspires.ftc.teamcode.Subsystems.Color.LEDSubsystem;
+import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 
 public class CarouselSubsystem extends SubsystemBase {
-    private Servo carousel;
-    private RevColorSensorV3 sensor;
-    public LEDSubsystem led;
-    private AnalogInput pos;
-    private int counter;
-    public boolean inOne, inTwo, inThree;
-    public static class ColorOutput {
-        public double RED, GREEN, BLUE;
-        public ColorOutput(double redIn, double greenIn, double blueIn) {
-            this.RED = redIn;
-            this.GREEN = greenIn;
-            this.BLUE = blueIn;
-        }
-
-        public double getRed() {
-            return this.RED;
-        }
-        public double getGreen() {
-            return this.GREEN;
-        }
-        public double getBlue() {
-            return this.BLUE;
-        }
-
-    }
-
     public static class Ball {
         public int position;
-        public Color.BallColor color;
+        public ColorConstants.BallColor color;
+        public boolean full;
 
-        public Ball(int pos, Color.BallColor colori) {
-            position = pos;
-            color = colori;
+        public Ball(int pos, ColorConstants.BallColor colorI) {
+            this.position = pos;
+            this.color = colorI;
+            this.full = false;
+        }
+        public Ball(int pos, ColorConstants.BallColor colorI, boolean fullI) {
+            this.position = pos;
+            this.color = colorI;
+            this.full = fullI;
         }
 
         public void setPosition(int p) {
             position = p;
         }
-        public void setColor(Color.BallColor c) {
+        public void setColor(ColorConstants.BallColor c) {
             this.color = c;
         }
     }
-
+    private Servo carousel;
+    private RevColorSensorV3 sensor;
+    private LEDSubsystem led;
+    private AnalogInput pos;
+    private int counter;
+    public boolean inOne, inTwo, inThree;
     public Ball ball1, ball2, ball3;
 
     /// Initialize Carousel Components with Constructors
@@ -67,24 +51,42 @@ public class CarouselSubsystem extends SubsystemBase {
 
         carousel.setDirection(Servo.Direction.REVERSE);
 
-        this.ball1 = new Ball(1, Color.BallColor.NULL);
-        this.ball2 = new Ball(2, Color.BallColor.NULL);
-        this.ball3 = new Ball(3, Color.BallColor.NULL);
+        this.ball1 = new Ball(1, ColorConstants.BallColor.NULL);
+        this.ball2 = new Ball(2, ColorConstants.BallColor.NULL);
+        this.ball3 = new Ball(3, ColorConstants.BallColor.NULL);
 
         this.counter = 0;
+    }
+
+    // Constructor to start the carousel at certain position
+    public CarouselSubsystem(HardwareMap map, int startingPos) {
+        sensor = map.get(RevColorSensorV3.class, "distance-sensor");
+        pos = map.get(AnalogInput.class, "carousel-pos");
+        carousel = map.get(Servo.class, "new");
+        led = new LEDSubsystem(map);
+
+        carousel.setDirection(Servo.Direction.REVERSE);
+
+        this.ball1 = new Ball(1, ColorConstants.BallColor.NULL);
+        this.ball2 = new Ball(2, ColorConstants.BallColor.NULL);
+        this.ball3 = new Ball(3, ColorConstants.BallColor.NULL);
+
+        this.counter = startingPos;
     }
 
     // Functions to be run every loop.
     public void periodic() {
         this.toPos(CarouselPosition.servoPosition(this.getCounter()));
-        this.updateColors();
-        this.updateBalls();
+        this.updateLEDColors();
+        this.limitCounter();
     }
 
-    /// Returns Position of Carousel Servo
+    /// Returns Raw Position of Carousel Servo
     public double getPosDouble() {
         return carousel.getPosition();
     }
+
+    /// Returns which 'capsule' is at the Intake hole
     public int getPosInt() {
         int counterNew = counter + 3;
 
@@ -99,59 +101,58 @@ public class CarouselSubsystem extends SubsystemBase {
         }
         else return 0;
     }
+
+    /// Returns if specified 'capsule' at Intake hole
     public boolean atPosInt(int i) {
         return getPosInt() == i;
     }
-    public void updateBalls() {
+
+    //TODO: updateBallColors() run only when distance sensor past threshold
+    public void updateBallColors() {
         if (atPosInt(1)) {
-            this.ball3.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
+            this.ball3.setColor(ColorConstants.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
             this.ball3.setPosition(1);
         }
         else if (atPosInt(2)) {
-            this.ball1.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
+            this.ball1.setColor(ColorConstants.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
             this.ball1.setPosition(2);
         }
         else if (atPosInt(3)) {
-            this.ball2.setColor(Color.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
+            this.ball2.setColor(ColorConstants.detectColor(colorSensorRed(), colorSensorGreen(), colorSensorBlue()));
             this.ball2.setPosition(3);
         }
 
     }
-    public void updateColors() {
+    public void updateLEDColors() {
         double b1c, b2c, b3c;
 
-        if (ball1.color == Color.BallColor.GREEN) {
-            b1c = Color.BALL_GREEN;
+        if (ball1.color == ColorConstants.BallColor.GREEN) {
+            b1c = ColorConstants.BALL_GREEN;
         }
-        else if (ball1.color == Color.BallColor.PURPLE) {
-            b1c = Color.BALL_PURPLE;
+        else if (ball1.color == ColorConstants.BallColor.PURPLE) {
+            b1c = ColorConstants.BALL_PURPLE;
         }
-        else b1c = Color.RED;
+        else b1c = ColorConstants.RED;
 
-        if (ball2.color == Color.BallColor.GREEN) {
-            b2c = Color.BALL_GREEN;
+        if (ball2.color == ColorConstants.BallColor.GREEN) {
+            b2c = ColorConstants.BALL_GREEN;
         }
-        else if (ball2.color == Color.BallColor.PURPLE) {
-            b2c = Color.BALL_PURPLE;
+        else if (ball2.color == ColorConstants.BallColor.PURPLE) {
+            b2c = ColorConstants.BALL_PURPLE;
         }
-        else b2c = Color.RED;
+        else b2c = ColorConstants.RED;
 
-        if (ball3.color == Color.BallColor.GREEN) {
-            b3c = Color.BALL_GREEN;
+        if (ball3.color == ColorConstants.BallColor.GREEN) {
+            b3c = ColorConstants.BALL_GREEN;
         }
-        else if (ball3.color == Color.BallColor.PURPLE) {
-            b3c = Color.BALL_PURPLE;
+        else if (ball3.color == ColorConstants.BallColor.PURPLE) {
+            b3c = ColorConstants.BALL_PURPLE;
         }
-        else b3c = Color.RED;
+        else b3c = ColorConstants.RED;
 
         led.setLED0(b1c);
         led.setLED1(b2c);
         led.setLED2(b3c);
-    }
-
-    /// LED
-    public void updateLED() {
-
     }
 
     /// Sets Position Counter
@@ -168,19 +169,21 @@ public class CarouselSubsystem extends SubsystemBase {
         else if (this.counter > CarouselPosition.counterMax) {this.counter = CarouselPosition.counterMax;}
     }
 
-    /// Returns distance from Color Sensor
-    public double getDistance() {
-        return sensor.getDistance(DistanceUnit.MM);
-    }
+
 
     /// Sets position of carousel servo
     public void toPos(double p) {
         carousel.setPosition(p);
     }
 
+    /// Returns distance from Color Sensor
+    public double getDistance() {
+        return sensor.getDistance(DistanceUnit.MM);
+    }
+
     /// Color Sensor Returns
-    public ColorOutput colorSensorReturn() {
-        return new ColorOutput(sensor.red(),sensor.green(),sensor.blue());
+    public ColorConstants.RGB colorSensorReturn() {
+        return new ColorConstants.RGB(sensor.red(),sensor.green(),sensor.blue());
     }
     public int colorSensorRed() {
         return sensor.red();
