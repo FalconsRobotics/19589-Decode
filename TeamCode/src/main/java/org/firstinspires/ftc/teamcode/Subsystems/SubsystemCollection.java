@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-
-import org.firstinspires.ftc.teamcode.Subsystems.Color.LEDSubsystem;
 
 import java.security.InvalidParameterException;
 

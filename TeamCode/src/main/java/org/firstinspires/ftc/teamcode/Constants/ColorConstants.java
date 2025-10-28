@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode.Subsystems.Color;
+package org.firstinspires.ftc.teamcode.Constants;
 
 import com.acmerobotics.dashboard.config.Config;
 
-public class Color {
+public class ColorConstants {
     /// Spectrum: 0.277 - 0.722 ( > 0.722 is White)
     public static double RED = 0.28;
     public static double ORANGE = 0.333;

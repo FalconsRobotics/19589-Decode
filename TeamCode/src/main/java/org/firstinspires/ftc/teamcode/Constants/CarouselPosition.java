@@ -8,7 +8,7 @@ public class CarouselPosition {
 
     /// Values tuned if 1st pickup is 'zeroed' at servo position 0.2
     public static double inputMin = 0.177;
-    public static int counterMin = 3;
+    public static int counterMin = -3;
     public static int counterMax = 11;
 
     public static double servoPosition(int input) {
