@@ -12,6 +12,6 @@ public class ShooterSubsystem {
     }
 
     public void setPower() {
-        extakeMotor.set
+        // TODO: Create PID control for rev control
     }
 }

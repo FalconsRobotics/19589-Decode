@@ -5,21 +5,21 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Subsystems.Controller;
+import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 
 @TeleOp
 public class ColorSensorTesting extends LinearOpMode {
     private FtcDashboard dashboard;
     public CarouselSubsystem hopper;
-    public Controller control;
+    public ControllerSubsystem control;
     // ... other variables
 
     public void runOpMode() {
 
         dashboard = FtcDashboard.getInstance();
         hopper = new CarouselSubsystem(hardwareMap);
-        control = new Controller(gamepad1, gamepad2);
+        control = new ControllerSubsystem(gamepad1, gamepad2);
 
         while (opModeInInit()) {
             if (control.base.isDown(GamepadKeys.Button.A)) {

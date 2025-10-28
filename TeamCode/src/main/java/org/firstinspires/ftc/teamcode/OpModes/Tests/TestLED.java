@@ -7,16 +7,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.Color;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Color.LED;
-import org.firstinspires.ftc.teamcode.Subsystems.Controller;
+import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 
 
 //@TeleOp (name = "LED Testing 10/08/25", group = "Test")
 @Disabled
 public class TestLED extends LinearOpMode {
     public LEDSubsystem led;
-    Controller control;
+    ControllerSubsystem control;
     double colorTracker = Color.MIN;
-    Controller.Toggle allMode;
+    ControllerSubsystem.Toggle allMode;
     Color.Pattern.CyclicGradient gradientCycle = new Color.Pattern.CyclicGradient(Color.RED);
     Color.Pattern.StraightGradient gradientStraight = new Color.Pattern.StraightGradient(Color.RED);
     Color.Pattern.Flash flashPattern = new Color.Pattern.Flash(Color.WHITE);
@@ -24,8 +24,8 @@ public class TestLED extends LinearOpMode {
 
     public void runOpMode() {
         led = new LEDSubsystem(hardwareMap);
-        control = new Controller(gamepad1,gamepad2);
-        allMode = new Controller.Toggle(true);
+        control = new ControllerSubsystem(gamepad1,gamepad2);
+        allMode = new ControllerSubsystem.Toggle(true);
         String debug = "null";
 
         while (opModeInInit()) {
