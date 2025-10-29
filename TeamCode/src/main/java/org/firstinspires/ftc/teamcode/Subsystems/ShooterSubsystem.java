@@ -20,7 +20,7 @@ public class ShooterSubsystem {
         extakeMotor = map.get(DcMotorEx.class, "ExtakeMotor");
         extakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        ledStrip = map.get(RevBlinkinLedDriver.class, "led-strip");
+        ledStrip = map.get(RevBlinkinLedDriver.class, "LEDStrip");
 
         // For PID, we want the motor to use the encoder, allowing it to
         // use it the built-in velocity control that comes with DcMotorEx.
