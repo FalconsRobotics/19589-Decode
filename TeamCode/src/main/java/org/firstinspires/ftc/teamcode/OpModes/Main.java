@@ -55,7 +55,7 @@ public class Main extends OpMode {
     public void start() {
         // As soon as the match starts (not when we init, when the match actually starts
         // and we're allowed to move), we want the shooter to get up to speed.
-        shooter.setPower(ShooterConstants.FIRING_SPEED);
+//        shooter.setPower(ShooterConstants.FIRING_SPEED);
     }
 
     @Override
@@ -70,6 +70,10 @@ public class Main extends OpMode {
         Gamepad1.readButtons();
         Gamepad2.readButtons();
 
+        // Subsystem control
+        shooter.setPower(ShooterConstants.FIRING_SPEED);
+        intake.setPower(1.0);
+
         // Gather joystick values from LX, LY (inverted, so up is forward y),
         // and RX (for turning) on Gamepad1.
         double cX = Gamepad1.getLeftX();
@@ -80,17 +84,14 @@ public class Main extends OpMode {
         // This is set to the Gamepad1 right trigger.
         double speedMultiplier = Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        // Robot-centric drive with the joystick inputs from earlier lines.
-        // I multiplied by speedMultiplier to allow using the trigger.
-        drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cA * speedMultiplier, -1);
-
         // Field-centric drive using the D-Pad inputs. Up goes up (y+), left goes left (x-), etc.
-        // Maybe should have braces for each case. However, you're never going to press more than
-        // one D-Pad input at a time.
         if (Gamepad1.isDown(GamepadKeys.Button.DPAD_UP)) drivebase.DriveFieldCentric(0, 1, 0, -1);
-        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_DOWN)) drivebase.DriveFieldCentric(0, -1, 0, -1);
-        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_LEFT)) drivebase.DriveFieldCentric(-1, 0, 0, -1);
-        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_RIGHT)) drivebase.DriveFieldCentric(1, 0, 0, -1);
+        else if (Gamepad1.isDown(GamepadKeys.Button.DPAD_DOWN)) drivebase.DriveFieldCentric(0, -1, 0, -1);
+        else if (Gamepad1.isDown(GamepadKeys.Button.DPAD_LEFT)) drivebase.DriveFieldCentric(-1, 0, 0, -1);
+        else if (Gamepad1.isDown(GamepadKeys.Button.DPAD_RIGHT)) drivebase.DriveFieldCentric(1, 0, 0, -1);
+        else { // If none of the D-Pad keys are pressed, then do regular robot-centric code.
+            drivebase.Drive(cX, cY, cA, -1);
+        }
 
         // Controls for the hopper. LB cycles it left, RB cycles it right a single time.
         // D-Pad down returns it back to zero / the center;
@@ -115,6 +116,7 @@ public class Main extends OpMode {
         telemetry.addData("Counter", hopper.getCounter());
         telemetry.addData("Servo Position", hopper.getPosDouble());
         telemetry.addLine("------------------------------");
+        telemetry.addData("Shooter Velocity", shooter.getVelocity());
         telemetry.update();
     }
 }

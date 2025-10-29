@@ -1,31 +1,33 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class MecanumDriveBase {
-    public MotorEx frontLeft, frontRight, backLeft, backRight;
+    public DcMotorEx frontLeft, frontRight, backLeft, backRight;
     public GoBildaPinpointDriver odo;
 
     public MecanumDriveBase(HardwareMap map) {
         // Initialize the motors. Change motor names if necessary.
-        frontLeft = map.get(MotorEx.class, "FrontLeft");
-        frontRight = map.get(MotorEx.class, "FrontRight");
-        backLeft = map.get(MotorEx.class, "BackLeft");
-        backRight = map.get(MotorEx.class, "BackRight");
+        frontLeft = map.get(DcMotorEx.class, "FrontLeft");
+        frontRight = map.get(DcMotorEx.class, "FrontRight");
+        backLeft = map.get(DcMotorEx.class, "BackLeft");
+        backRight = map.get(DcMotorEx.class, "BackRight");
 
         // Reverse motors if necessary, set zero-power behavior, and
         // set run modes
-        frontLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        frontRight.setDirection(DcMotorEx.Direction.REVERSE);
+        backRight.setDirection(DcMotorEx.Direction.REVERSE);
 
         // Set up the GoBilda PinPoint Odometry computer for odometry use.
         // Here, we have it setup to use the GoBilda 4-bar odometry pods, with
@@ -53,10 +55,10 @@ public class MecanumDriveBase {
     /// @param heading TODO: Add future lock-to-heading functionality.
     public void Drive(double x, double y, double a, double heading) {
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(a), 1);
-        frontLeft.set((y + x + a) / denominator);
-        frontRight.set((y - x + a) / denominator);
-        backLeft.set((y - x - a) / denominator);
-        backRight.set((y + x - a) / denominator);
+        frontLeft.setPower((y + x + a) / denominator);
+        frontRight.setPower((y - x + a) / denominator);
+        backLeft.setPower((y - x - a) / denominator);
+        backRight.setPower((y + x - a) / denominator);
     }
 
     /// Drive using field-centric mode. SolversLib does implement this themselves, but I would like
@@ -73,9 +75,9 @@ public class MecanumDriveBase {
         double rotatedX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
         double rotatedY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
-        frontLeft.set((rotatedY + rotatedX + a) / denominator);
-        frontRight.set((rotatedY - rotatedX + a) / denominator);
-        backLeft.set((rotatedY - rotatedX - a) / denominator);
-        backRight.set((rotatedY + rotatedX - a) / denominator);
+        frontLeft.setPower((rotatedY + rotatedX + a) / denominator);
+        frontRight.setPower((rotatedY - rotatedX + a) / denominator);
+        backLeft.setPower((rotatedY - rotatedX - a) / denominator);
+        backRight.setPower((rotatedY + rotatedX - a) / denominator);
     }
 }

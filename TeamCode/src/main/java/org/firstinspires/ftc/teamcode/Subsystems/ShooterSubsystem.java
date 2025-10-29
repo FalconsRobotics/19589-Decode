@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
@@ -58,5 +56,18 @@ public class ShooterSubsystem {
         // Sets the motor velocity to speed (in RPM), converting the
         // RPM to ticks.
         extakeMotor.setVelocity(speed * 60 / ShooterConstants.MOTOR_RPMS);
+    }
+
+    /// Returns the motor velcoity in specified units
+    /// @returns The velocity of the shooter motor in ticks.
+    public double getVelocity() {
+        return extakeMotor.getVelocity();
+    }
+
+    /// Returns the motor velcoity in specified units
+    /// @param unit The AngleUnit you want the velocity to be returned in
+    /// @returns The velocity of the shooter motor in the specified units.
+    public double getVelocity(AngleUnit unit) {
+        return extakeMotor.getVelocity(unit);
     }
 }

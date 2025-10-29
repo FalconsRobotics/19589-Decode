@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 
+@Disabled
 @TeleOp
 public class ColorSensorTesting extends LinearOpMode {
     private FtcDashboard dashboard;
