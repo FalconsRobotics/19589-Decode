@@ -4,6 +4,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -19,10 +20,17 @@ public class MecanumDriveBase {
         backLeft = map.get(MotorEx.class, "BackLeft");
         backRight = map.get(MotorEx.class, "BackRight");
 
+        // Reverse motors if necessary, set zero-power behavior, and
+        // set run modes
+        frontLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         // Set up the GoBilda PinPoint Odometry computer for odometry use.
         // Here, we have it setup to use the GoBilda 4-bar odometry pods, with
-        // directions set to forward (change if necessary for your own robot),
-        // and then it recalibrates itself.
+        // encoder directions set to forward (change if necessary for your own
+        // robot), and then it recalibrates itself.
         odo = map.get(GoBildaPinpointDriver.class, "odo");
         odo.initialize();
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);

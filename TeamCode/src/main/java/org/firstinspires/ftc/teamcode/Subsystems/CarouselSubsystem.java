@@ -37,16 +37,14 @@ public class CarouselSubsystem extends SubsystemBase {
     private Servo carousel;
     private RevColorSensorV3 sensor;
     private LEDSubsystem led;
-    private AnalogInput pos;
     private int counter;
     public boolean inOne, inTwo, inThree;
     public Ball ball1, ball2, ball3;
 
     /// Initialize Carousel Components with Constructors
     public CarouselSubsystem(HardwareMap map) {
-        sensor = map.get(RevColorSensorV3.class, "distance-sensor");
-        pos = map.get(AnalogInput.class, "carousel-pos");
-        carousel = map.get(Servo.class, "new");
+        sensor = map.get(RevColorSensorV3.class, "HopperColorSensor");
+        carousel = map.get(Servo.class, "CarouselServo");
         led = new LEDSubsystem(map);
 
         carousel.setDirection(Servo.Direction.REVERSE);
@@ -60,9 +58,8 @@ public class CarouselSubsystem extends SubsystemBase {
 
     // Constructor to start the carousel at certain position
     public CarouselSubsystem(HardwareMap map, int startingPos) {
-        sensor = map.get(RevColorSensorV3.class, "distance-sensor");
-        pos = map.get(AnalogInput.class, "carousel-pos");
-        carousel = map.get(Servo.class, "new");
+        sensor = map.get(RevColorSensorV3.class, "HopperColorSensor");
+        carousel = map.get(Servo.class, "CarouselServo");
         led = new LEDSubsystem(map);
 
         carousel.setDirection(Servo.Direction.REVERSE);
