@@ -169,8 +169,6 @@ public class CarouselSubsystem extends SubsystemBase {
         else if (this.counter > CarouselPosition.counterMax) {this.counter = CarouselPosition.counterMax;}
     }
 
-
-
     /// Sets position of carousel servo
     public void toPos(double p) {
         carousel.setPosition(p);
