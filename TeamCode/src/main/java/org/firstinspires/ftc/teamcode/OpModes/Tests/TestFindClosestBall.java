@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@Disabled
 @TeleOp(name = "Find Closest Ball - Teigan", group = "Test")
 public class TestFindClosestBall extends LinearOpMode {
 

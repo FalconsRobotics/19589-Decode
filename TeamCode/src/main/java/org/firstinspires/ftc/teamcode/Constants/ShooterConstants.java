@@ -13,7 +13,7 @@ public class ShooterConstants {
     public static final double MOTOR_RPMS = 28; // Taken from GoBilda, from a 6000RPM motor.
 
     // PID Values, tune as necessary
-    public static final double kP = 0.005;
+    public static final double kP = 0.05;
     public static final double kI = 0.001;
     public static final double kD = 0.01;
     public static final double kF = 0.015;

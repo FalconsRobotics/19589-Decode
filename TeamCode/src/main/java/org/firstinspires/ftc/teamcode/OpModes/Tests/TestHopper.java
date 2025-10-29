@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 
+@Disabled
 @TeleOp(name = "Hopper Test - Nico")
 public class TestHopper extends LinearOpMode {
     public ControllerSubsystem control;
