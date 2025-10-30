@@ -9,10 +9,12 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
+
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Subsystems.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class Main extends OpMode {
     // "whenJustPressed()" and "isDown()" functionality to maintain simplicity.
     GamepadEx Gamepad1;
     GamepadEx Gamepad2;
+    ControllerSubsystem.Toggle autoMode;
 
     // Distance sensor variable
     public boolean sensorUpdated = false;
@@ -50,6 +53,7 @@ public class Main extends OpMode {
         // Initialize the Gamepads for use from SolversLib.
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
+        autoMode = new ControllerSubsystem.Toggle(false);
 
         // Enable bulk cached reading to speed up I2C read times.
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -81,6 +85,9 @@ public class Main extends OpMode {
         // SolversLib requires that we read the gamepad every loop.
         Gamepad1.readButtons();
         Gamepad2.readButtons();
+
+        // Switch between automated carousel rotation
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.START)) {autoMode.toggle();}
 
         // Subsystem control
         shooter.setPower(ShooterConstants.FIRING_SPEED);
@@ -117,9 +124,11 @@ public class Main extends OpMode {
             }
         }
 
+        // Automation carousel rotation
         if (hopper.distance <= CarouselPosition.distanceMax) {
             if (!sensorUpdated) {
-                hopper.updateBallColors();
+                hopper.setCounter(hopper.getCounter() + 1);
+
                 sensorUpdated = true;
             }
             ballColor = ColorConstants.detectColor(rgb);
