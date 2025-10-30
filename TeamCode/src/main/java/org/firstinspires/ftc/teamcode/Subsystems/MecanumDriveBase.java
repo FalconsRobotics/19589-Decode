@@ -5,12 +5,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Constants.DriveConstants;
 
 public class MecanumDriveBase {
     public DcMotorEx frontLeft, frontRight, backLeft, backRight;
     public GoBildaPinpointDriver odo;
+
+    double targetHeading = 0.0;
 
     public MecanumDriveBase(HardwareMap map) {
         // Initialize the motors. Change motor names if necessary.
@@ -56,8 +60,8 @@ public class MecanumDriveBase {
     public void Drive(double x, double y, double a, double heading) {
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(a), 1);
         frontLeft.setPower((y + x + a) / denominator);
-        frontRight.setPower((y - x + a) / denominator);
-        backLeft.setPower((y - x - a) / denominator);
+        frontRight.setPower((y - x - a) / denominator);
+        backLeft.setPower((y - x + a) / denominator);
         backRight.setPower((y + x - a) / denominator);
     }
 
@@ -66,18 +70,48 @@ public class MecanumDriveBase {
     /// @param x The x-value, normally taken from the controller joystick inputs, to use to drive.
     /// @param y The y-value, normally taken from the controller joystick inputs, to use to drive.
     /// @param a The angle value, normally taken from the controller joystick inputs,
-    ///          to use to rotate the robot.
-    /// @param heading TODO: Add future lock-to-heading functionality.
-    public void DriveFieldCentric(double x, double y, double a, double heading) {
+    ///          that you want the robot to face
+    public void DriveFieldCentric(double x, double y, double a) {
         double botHeading = odo.getHeading(AngleUnit.RADIANS);
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(a), 1);
 
         double rotatedX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
         double rotatedY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
 
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(a), 1);
         frontLeft.setPower((rotatedY + rotatedX + a) / denominator);
         frontRight.setPower((rotatedY - rotatedX + a) / denominator);
         backLeft.setPower((rotatedY - rotatedX - a) / denominator);
         backRight.setPower((rotatedY + rotatedX - a) / denominator);
+    }
+
+    /// Drive using field-centric mode with an additional heading lock.
+    /// @param gpX The x-value, normally taken from the controller joystick inputs, to use to drive.
+    /// @param gpY The y-value, normally taken from the controller joystick inputs, to use to drive.
+    /// @param gpA The angle you want the robot to be set to, in degrees.
+    public void DriveFieldCentricWithLock(double gpX, double gpY, double gpA) {
+        double botHeading = odo.getHeading(AngleUnit.DEGREES);
+        double a;
+
+        if (Math.abs(gpX) >= 0.05 && Math.abs(gpY) >= 0.05) {
+            a = gpA;
+            this.targetHeading = botHeading;
+        } else {
+            double headingError = ((this.targetHeading - botHeading) + 540) % 360;
+            a = Range.clip(headingError * DriveConstants.HEADING_KP, -DriveConstants.MAX_HEADING_CORRECTION_SPEED, DriveConstants.MAX_HEADING_CORRECTION_SPEED);
+        }
+
+        double botHeadingRadians = Math.toRadians(botHeading);
+        double rotatedX = gpX * Math.cos(-botHeadingRadians) - gpY * Math.sin(-botHeadingRadians);
+        double rotatedY = gpX * Math.sin(-botHeadingRadians) + gpY * Math.cos(-botHeadingRadians);
+
+        double denominator = Math.max(Math.abs(rotatedX) + Math.abs(rotatedY) + Math.abs(a), 1.0);
+        frontLeft.setPower((rotatedY + rotatedX + a) / denominator);
+        frontRight.setPower((rotatedY - rotatedX - a) / denominator);
+        backLeft.setPower((rotatedY - rotatedX + a) / denominator);
+        backRight.setPower((rotatedY + rotatedX - a) / denominator);
+    }
+
+    public void setTargetHeading(double heading) {
+        this.targetHeading = heading;
     }
 }

@@ -78,20 +78,13 @@ public class Main extends OpMode {
         // and RX (for turning) on Gamepad1.
         double cX = Gamepad1.getLeftX();
         double cY = -Gamepad1.getLeftY();
-        double cA = Gamepad1.getRightX();
+        double cRX = Gamepad1.getRightX();
+        double cRY = -Gamepad1.getRightY();
 
-        // Use the trigger for manual speed control, added on top of the joystick magnitude.
-        // This is set to the Gamepad1 right trigger.
-        double speedMultiplier = Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        double turnAngle = Math.atan2(cRX, cRY);
+        double speedMultiplier = 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        // Field-centric drive using the D-Pad inputs. Up goes up (y+), left goes left (x-), etc.
-        if (Gamepad1.isDown(GamepadKeys.Button.DPAD_UP)) drivebase.DriveFieldCentric(0, 1, 0, -1);
-        else if (Gamepad1.isDown(GamepadKeys.Button.DPAD_DOWN)) drivebase.DriveFieldCentric(0, -1, 0, -1);
-        else if (Gamepad1.isDown(GamepadKeys.Button.DPAD_LEFT)) drivebase.DriveFieldCentric(-1, 0, 0, -1);
-        else if (Gamepad1.isDown(GamepadKeys.Button.DPAD_RIGHT)) drivebase.DriveFieldCentric(1, 0, 0, -1);
-        else { // If none of the D-Pad keys are pressed, then do regular robot-centric code.
-            drivebase.Drive(cX, cY, cA, -1);
-        }
+        drivebase.DriveFieldCentricWithLock(cX * speedMultiplier, cY * speedMultiplier, turnAngle);
 
         // Controls for the hopper. LB cycles it left, RB cycles it right a single time.
         // D-Pad down returns it back to zero / the center;
