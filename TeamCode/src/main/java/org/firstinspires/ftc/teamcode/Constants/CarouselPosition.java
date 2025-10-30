@@ -12,8 +12,8 @@ public class CarouselPosition {
     public static int counterMax = 11;
 
     public static double servoPosition(int input) {
-        double stepSize = (0.4 - 0.2) / 3.0;
-        return (inputMin + (input * stepSize));
+        double stepSize = 0.2 / 3.0;
+        return (inputMin + (input * stepSize * 0.9));
     }
 
 

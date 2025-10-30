@@ -74,9 +74,18 @@ public class CarouselSubsystem extends SubsystemBase {
 
     // Functions to be run every loop.
     public void periodic() {
-        this.toPos(CarouselPosition.servoPosition(this.getCounter()));
+        if (this.allOccupied()) {
+
+        }
+        else {
+            this.toPos(CarouselPosition.servoPosition(this.getCounter()));
+        }
         this.updateLEDColors();
         this.limitCounter();
+    }
+
+    public boolean allOccupied() {
+        return (this.inOne && this.inTwo && this.inThree);
     }
 
     /// Returns Raw Position of Carousel Servo
