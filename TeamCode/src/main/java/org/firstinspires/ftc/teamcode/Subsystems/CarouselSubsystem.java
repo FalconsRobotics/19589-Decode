@@ -40,6 +40,7 @@ public class CarouselSubsystem extends SubsystemBase {
     private int counter;
     public boolean inOne, inTwo, inThree;
     public Ball ball1, ball2, ball3;
+    public double distance;
 
     /// Initialize Carousel Components with Constructors
     public CarouselSubsystem(HardwareMap map) {

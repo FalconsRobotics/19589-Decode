@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
+import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
@@ -31,6 +33,11 @@ public class Main extends OpMode {
     GamepadEx Gamepad1;
     GamepadEx Gamepad2;
 
+    // Distance sensor variable
+    public boolean sensorUpdated = false;
+    ColorConstants.RGB rgb = new ColorConstants.RGB(0,0,0);
+    ColorConstants.BallColor ballColor = ColorConstants.BallColor.NULL;
+
     @Override
     public void init() {
         // Set up the various subsystems.
@@ -49,6 +56,8 @@ public class Main extends OpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
+
+
     }
 
     @Override
@@ -65,6 +74,9 @@ public class Main extends OpMode {
         drivebase.periodic();
         hopper.periodic();
         shooter.periodic();
+
+        // Read out Color Sensor values
+        rgb.setRGB(hopper.colorSensorRed(), hopper.colorSensorGreen(), hopper.colorSensorBlue());
 
         // SolversLib requires that we read the gamepad every loop.
         Gamepad1.readButtons();
@@ -103,6 +115,18 @@ public class Main extends OpMode {
             if (shooter.isInPowerBand() || Gamepad2.isDown(GamepadKeys.Button.LEFT_BUMPER)) {
                 hopper.setCounter(hopper.getCounter() - 3);
             }
+        }
+
+        if (hopper.distance <= CarouselPosition.distanceMax) {
+            if (!sensorUpdated) {
+                hopper.updateBallColors();
+                sensorUpdated = true;
+            }
+            ballColor = ColorConstants.detectColor(rgb);
+        }
+        else {
+            sensorUpdated = false;
+            ballColor = ColorConstants.BallColor.NULL;
         }
 
         telemetry.addLine("------------------------------");
