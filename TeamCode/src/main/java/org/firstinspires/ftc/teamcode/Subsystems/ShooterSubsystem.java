@@ -71,14 +71,14 @@ public class ShooterSubsystem {
     }
 
     /// Returns the motor velcoity in specified units
-    /// @returns The velocity of the shooter motor in ticks.
+    /// @return The velocity of the shooter motor in ticks.
     public double getVelocity() {
         return extakeMotor.getVelocity();
     }
 
     /// Returns the motor velcoity in specified units
     /// @param unit The AngleUnit you want the velocity to be returned in
-    /// @returns The velocity of the shooter motor in the specified units.
+    /// @return The velocity of the shooter motor in the specified units.
     public double getVelocity(AngleUnit unit) {
         return extakeMotor.getVelocity(unit);
     }

@@ -77,6 +77,7 @@ public class CarouselSubsystem extends SubsystemBase {
         this.toPos(CarouselPosition.servoPosition(this.getCounter()));
         this.updateLEDColors();
         this.limitCounter();
+        this.distance = this.getDistance();
     }
 
     /// Returns Raw Position of Carousel Servo

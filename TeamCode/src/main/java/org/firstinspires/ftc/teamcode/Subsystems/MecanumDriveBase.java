@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
@@ -14,6 +13,7 @@ public class MecanumDriveBase {
     public DcMotorEx frontLeft, frontRight, backLeft, backRight;
     public GoBildaPinpointDriver odo;
 
+    double currentForwardPower = 0.0;
     double targetHeading = 0.0;
 
     public MecanumDriveBase(HardwareMap map) {
@@ -30,8 +30,8 @@ public class MecanumDriveBase {
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        frontRight.setDirection(DcMotorEx.Direction.REVERSE);
-        backRight.setDirection(DcMotorEx.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        backLeft.setDirection(DcMotorEx.Direction.REVERSE);
 
         // Set up the GoBilda PinPoint Odometry computer for odometry use.
         // Here, we have it setup to use the GoBilda 4-bar odometry pods, with
@@ -57,12 +57,23 @@ public class MecanumDriveBase {
     /// @param a The angle value, normally taken from the controller joystick inputs,
     ///          to use to rotate the robot.
     /// @param heading TODO: Add future lock-to-heading functionality.
+    /// TODO: Add forward slewing functionality.
     public void Drive(double x, double y, double a, double heading) {
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(a), 1);
-        frontLeft.setPower((y + x + a) / denominator);
-        frontRight.setPower((y - x - a) / denominator);
-        backLeft.setPower((y - x + a) / denominator);
-        backRight.setPower((y + x - a) / denominator);
+        double powerDifference = y - currentForwardPower;
+
+        if (powerDifference > DriveConstants.MAX_POWER_STEP) {
+            powerDifference = DriveConstants.MAX_POWER_STEP;
+        } else if (powerDifference < -DriveConstants.MAX_POWER_STEP) {
+            powerDifference = -DriveConstants.MAX_POWER_STEP;
+        }
+
+        currentForwardPower += powerDifference;
+
+        double denominator = Math.max(Math.abs(currentForwardPower) + Math.abs(x) + Math.abs(a), 1);
+        frontLeft.setPower((currentForwardPower + x + a) / denominator);
+        frontRight.setPower((currentForwardPower - x - a) / denominator);
+        backLeft.setPower((currentForwardPower - x + a) / denominator);
+        backRight.setPower((currentForwardPower + x - a) / denominator);
     }
 
     /// Drive using field-centric mode. SolversLib does implement this themselves, but I would like
@@ -79,30 +90,32 @@ public class MecanumDriveBase {
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(a), 1);
         frontLeft.setPower((rotatedY + rotatedX + a) / denominator);
-        frontRight.setPower((rotatedY - rotatedX + a) / denominator);
-        backLeft.setPower((rotatedY - rotatedX - a) / denominator);
+        frontRight.setPower((rotatedY - rotatedX - a) / denominator);
+        backLeft.setPower((rotatedY - rotatedX + a) / denominator);
         backRight.setPower((rotatedY + rotatedX - a) / denominator);
     }
 
     /// Drive using field-centric mode with an additional heading lock.
-    /// @param gpX The x-value, normally taken from the controller joystick inputs, to use to drive.
-    /// @param gpY The y-value, normally taken from the controller joystick inputs, to use to drive.
-    /// @param gpA The angle you want the robot to be set to, in degrees.
-    public void DriveFieldCentricWithLock(double gpX, double gpY, double gpA) {
-        double botHeading = odo.getHeading(AngleUnit.DEGREES);
-        double a;
+    /// @param gpLX The x-value, normally taken from the controller joystick inputs, to use to drive.
+    /// @param gpLY The y-value, normally taken from the controller joystick inputs, to use to drive.
+    /// @param gpRX The angle you want the robot to be set to, in degrees.
+    public void DriveFieldCentricWithLock(double gpLX, double gpLY, double gpRX, double gpRY) {
+        double rotStickMagnitude = Math.hypot(gpRX, gpRY);
 
-        if (Math.abs(gpX) >= 0.05 && Math.abs(gpY) >= 0.05) {
-            a = gpA;
-            this.targetHeading = botHeading;
-        } else {
-            double headingError = ((this.targetHeading - botHeading) + 540) % 360;
-            a = Range.clip(headingError * DriveConstants.HEADING_KP, -DriveConstants.MAX_HEADING_CORRECTION_SPEED, DriveConstants.MAX_HEADING_CORRECTION_SPEED);
+        if (rotStickMagnitude > 0.25) {
+            double stickAngleRadians = Math.atan2(gpRX, gpRY);
+            double stickAngleDegrees = Math.toDegrees(stickAngleRadians);
+
+            this.targetHeading = (stickAngleDegrees + 540) % 360;
         }
 
-        double botHeadingRadians = Math.toRadians(botHeading);
-        double rotatedX = gpX * Math.cos(-botHeadingRadians) - gpY * Math.sin(-botHeadingRadians);
-        double rotatedY = gpX * Math.sin(-botHeadingRadians) + gpY * Math.cos(-botHeadingRadians);
+        double currentHeadingDegrees = odo.getHeading(AngleUnit.DEGREES);
+        double headingError = ((this.targetHeading - currentHeadingDegrees) + 540) % 360;
+        double a = Range.clip(headingError * DriveConstants.HEADING_KP, -DriveConstants.MAX_HEADING_CORRECTION_SPEED, DriveConstants.MAX_HEADING_CORRECTION_SPEED);
+
+        double botHeadingRadians = Math.toRadians(currentHeadingDegrees);
+        double rotatedX = gpLX * Math.cos(-botHeadingRadians) - gpLY * Math.sin(-botHeadingRadians);
+        double rotatedY = gpLX * Math.sin(-botHeadingRadians) + gpLY * Math.cos(-botHeadingRadians);
 
         double denominator = Math.max(Math.abs(rotatedX) + Math.abs(rotatedY) + Math.abs(a), 1.0);
         frontLeft.setPower((rotatedY + rotatedX + a) / denominator);
