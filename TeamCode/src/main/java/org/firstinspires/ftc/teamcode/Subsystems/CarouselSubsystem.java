@@ -147,9 +147,9 @@ public class CarouselSubsystem extends SubsystemBase {
         }
         else b3c = ColorConstants.RED;
 
-        led.setLED0(b1c);
-        led.setLED1(b2c);
-        led.setLED2(b3c);
+        led.setLedColor(0, b1c);
+        led.setLedColor(1, b2c);
+        led.setLedColor(2, b3c);
     }
 
     /// Sets Position Counter
