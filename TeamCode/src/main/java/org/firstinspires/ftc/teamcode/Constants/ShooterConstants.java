@@ -6,15 +6,15 @@ import com.acmerobotics.dashboard.config.Config;
 /// related to the shooter in one place for simplicity.
 @Config
 public class ShooterConstants {
-    public static final double HIGH_RPM_RANGE = 5500; // in RPMs
-    public static final double LOW_RPM_RANGE = 5000; // in RPMS
-    public static final double FIRING_SPEED = 5250;
+    public static double HIGH_RPM_RANGE = 5500; // in RPMs
+    public static double LOW_RPM_RANGE = 5000; // in RPMS
+    public static double FIRING_SPEED = 5250;
 
-    public static final double MOTOR_RPMS = 28; // Taken from GoBilda, from a 6000RPM motor.
+    public static double MOTOR_RPMS = 28; // Taken from GoBilda, from a 6000RPM motor.
 
     // PID Values, tune as necessary
-    public static final double kP = 0.05;
-    public static final double kI = 0.001;
-    public static final double kD = 0.01;
-    public static final double kF = 0.015;
+    public static double kP = 5;
+    public static double kI = 5;
+    public static double kD = 5;
+    public static double kF = 5;
 }

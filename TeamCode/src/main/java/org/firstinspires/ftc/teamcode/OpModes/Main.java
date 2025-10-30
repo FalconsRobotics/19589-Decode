@@ -6,10 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
-
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveBase;
@@ -41,8 +41,7 @@ public class Main extends OpMode {
     ColorConstants.RGB rgb = new ColorConstants.RGB(0,0,0);
     ColorConstants.BallColor ballColor = ColorConstants.BallColor.NULL;
 
-    @Override
-    public void init() {
+    @Override public void init() {
         // Set up the various subsystems.
         // TODO: When adding commands, add in SubsystemsCollection
         drivebase = new MecanumDriveBase(hardwareMap);
@@ -60,19 +59,9 @@ public class Main extends OpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-
-
     }
 
-    @Override
-    public void start() {
-        // As soon as the match starts (not when we init, when the match actually starts
-        // and we're allowed to move), we want the shooter to get up to speed.
-//        shooter.setPower(ShooterConstants.FIRING_SPEED);
-    }
-
-    @Override
-    public void loop() {
+    @Override public void loop() {
         // Call the periodic functions from the SubsystemCollection
         // class. Functions that need to be run every loop.
         drivebase.periodic();
@@ -96,53 +85,52 @@ public class Main extends OpMode {
         // Gather joystick values from LX, LY (inverted, so up is forward y),
         // and RX (for turning) on Gamepad1.
         double cX = Gamepad1.getLeftX();
-        double cY = -Gamepad1.getLeftY();
+        double cY = Gamepad1.getLeftY();
         double cRX = Gamepad1.getRightX();
         double cRY = -Gamepad1.getRightY();
 
         double turnAngle = Math.atan2(cRX, cRY);
         double speedMultiplier = 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
 
-        drivebase.DriveFieldCentricWithLock(cX * speedMultiplier, cY * speedMultiplier, turnAngle);
+        drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, -1);
+//        drivebase.DriveFieldCentricWithLock(cX * speedMultiplier, cY * speedMultiplier, cRX, cRY);
 
         // Controls for the hopper. LB cycles it left, RB cycles it right a single time.
         // D-Pad down returns it back to zero / the center;
         if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
             hopper.setCounter(hopper.getCounter() - 1);
-        } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+        }
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
             hopper.setCounter(hopper.getCounter() + 1);
-        } else if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+        }
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
             hopper.setCounter(0);
         }
 
-        // If the right trigger is pressed (at least halfway, range doesn't really matter),
-        // make sure the shooter is at the optimal speed or check if the override (left bumper
-        // in this case) is pressed, then shoot all three balls.
-        if (Gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.5) {
-            if (shooter.isInPowerBand() || Gamepad2.isDown(GamepadKeys.Button.LEFT_BUMPER)) {
-                hopper.setCounter(hopper.getCounter() - 3);
-            }
-        }
-
         // Automation carousel rotation
-        if (hopper.distance <= CarouselPosition.distanceMax) {
-            if (!sensorUpdated) {
-                hopper.setCounter(hopper.getCounter() + 1);
-
-                sensorUpdated = true;
-            }
-            ballColor = ColorConstants.detectColor(rgb);
-        }
-        else {
-            sensorUpdated = false;
-            ballColor = ColorConstants.BallColor.NULL;
-        }
+//        if (autoMode.isTrue()) {
+//            if (hopper.distance <= CarouselPosition.distanceMax) {
+//                if (!sensorUpdated) {
+//                    hopper.setCounter(hopper.getCounter() + 1);
+//
+//                    sensorUpdated = true;
+//                }
+//                ballColor = ColorConstants.detectColor(rgb);
+//            } else {
+//                sensorUpdated = false;
+//                ballColor = ColorConstants.BallColor.NULL;
+//            }
+//        }
 
         telemetry.addLine("------------------------------");
         telemetry.addData("Counter", hopper.getCounter());
         telemetry.addData("Servo Position", hopper.getPosDouble());
         telemetry.addLine("------------------------------");
         telemetry.addData("Shooter Velocity", shooter.getVelocity());
+        telemetry.addData("Heading", drivebase.odo.getHeading(AngleUnit.DEGREES));
+        telemetry.addLine("------------------------------");
+        telemetry.addData("Automated Carousel", autoMode.isTrue());
+        telemetry.addData("Distance", hopper.distance);
         telemetry.update();
     }
 }

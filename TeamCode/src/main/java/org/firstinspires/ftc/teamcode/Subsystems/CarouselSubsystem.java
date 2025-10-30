@@ -82,6 +82,7 @@ public class CarouselSubsystem extends SubsystemBase {
         }
         this.updateLEDColors();
         this.limitCounter();
+        this.distance = this.getDistance();
     }
 
     public boolean allOccupied() {
