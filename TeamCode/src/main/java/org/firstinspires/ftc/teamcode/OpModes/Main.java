@@ -73,7 +73,7 @@ public class Main extends OpMode {
         // class. Functions that need to be run every loop.
         drivebase.periodic();
         hopper.periodic();
-        shooter.periodic();
+        shooter.periodic(gamepad2);
 
         // Read out Color Sensor values
         rgb.setRGB(hopper.colorSensorRed(), hopper.colorSensorGreen(), hopper.colorSensorBlue());

@@ -5,8 +5,10 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
@@ -45,8 +47,9 @@ public class ShooterSubsystem {
     }
 
     /// Functions to be run every frame.
-    public void periodic() {
-        setStripColor();
+    public void periodic(Gamepad gp) {
+        setLEDColor();
+        rumbleController(gp);
     }
 
     /// Checks whether the shooter motor is in the correct power
@@ -68,6 +71,12 @@ public class ShooterSubsystem {
 
     public void setLEDColor() {
         led.setLedColor(3, (isInPowerBand()? ColorConstants.GREEN : ColorConstants.RED));
+    }
+
+    public void rumbleController (Gamepad gp) {
+        if (isInPowerBand()) {
+            gp.rumble(500);
+        }
     }
 
     /// Returns the motor velcoity in specified units
