@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 
-@Disabled
 @TeleOp(name = "Hopper Test - Nico")
 public class TestHopper extends LinearOpMode {
     public ControllerSubsystem control;
@@ -33,6 +32,8 @@ public class TestHopper extends LinearOpMode {
             if (control.base.wasJustPressed(GamepadKeys.Button.A)) {
                 hopper.toPos(0.2);
             }
+            telemetry.addData("Pos", hopper.getPosDouble());
+            telemetry.update();
         }
 
         while (opModeIsActive()) {

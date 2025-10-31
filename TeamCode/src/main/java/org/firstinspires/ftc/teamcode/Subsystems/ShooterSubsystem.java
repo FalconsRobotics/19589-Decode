@@ -9,11 +9,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
 
 public class ShooterSubsystem {
     private final DcMotorEx extakeMotor;
     private final RevBlinkinLedDriver ledStrip;
+    private LEDSubsystem led;
 
     public ShooterSubsystem(HardwareMap map) {
         // Setup the motor, set its direction correctly.
@@ -21,6 +23,7 @@ public class ShooterSubsystem {
         extakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ledStrip = map.get(RevBlinkinLedDriver.class, "LEDStrip");
+        led = new LEDSubsystem(map);
 
         // For PID, we want the motor to use the encoder, allowing it to
         // use it the built-in velocity control that comes with DcMotorEx.
@@ -63,11 +66,8 @@ public class ShooterSubsystem {
         extakeMotor.setVelocity(speed * 60 / ShooterConstants.MOTOR_RPMS);
     }
 
-    public void setStripColor() {
-        ledStrip.setPattern(
-                isInPowerBand() ?
-                        RevBlinkinLedDriver.BlinkinPattern.GREEN :
-                        RevBlinkinLedDriver.BlinkinPattern.LARSON_SCANNER_RED);
+    public void setLEDColor() {
+        led.setLedColor(3, (isInPowerBand()? ColorConstants.GREEN : ColorConstants.RED));
     }
 
     /// Returns the motor velcoity in specified units

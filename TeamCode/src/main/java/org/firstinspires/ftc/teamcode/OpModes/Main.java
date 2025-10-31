@@ -34,7 +34,7 @@ public class Main extends OpMode {
     // "whenJustPressed()" and "isDown()" functionality to maintain simplicity.
     GamepadEx Gamepad1;
     GamepadEx Gamepad2;
-    ControllerSubsystem.Toggle autoMode;
+    ControllerSubsystem.Toggle autoMode, zeroPos;
 
     // Distance sensor variable
     public boolean sensorUpdated = false;
@@ -53,11 +53,18 @@ public class Main extends OpMode {
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
         autoMode = new ControllerSubsystem.Toggle(false);
+        zeroPos = new ControllerSubsystem.Toggle(false);
 
         // Enable bulk cached reading to speed up I2C read times.
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+    }
+
+    @Override public void init_loop() {
+        if (Gamepad2.isDown(GamepadKeys.Button.A) || Gamepad1.isDown(GamepadKeys.Button.A)) {
+            hopper.toPos(CarouselPosition.halfwayPosition(0));
         }
     }
 
@@ -77,9 +84,12 @@ public class Main extends OpMode {
 
         // Switch between automated carousel rotation
         if (Gamepad2.wasJustPressed(GamepadKeys.Button.START)) {autoMode.toggle();}
+        //if(Gamepad2.wasJustPressed(GamepadKeys.Button.BACK)) {zeroPos.toggle();}
 
         // Subsystem control
         shooter.setPower(ShooterConstants.FIRING_SPEED);
+
+        //Shutoff intake when carousel is full
         intake.setPower(1.0);
 
         // Gather joystick values from LX, LY (inverted, so up is forward y),
@@ -99,29 +109,48 @@ public class Main extends OpMode {
         // D-Pad down returns it back to zero / the center;
         if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
             hopper.setCounter(hopper.getCounter() - 1);
-        }
-        if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-            hopper.setCounter(hopper.getCounter() + 1);
+            hopper.toPos(hopper.getPosDouble() - 0.07);
         }
         if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
             hopper.setCounter(0);
+            hopper.toPosCounter();
+        }
+        if (Gamepad2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.5) {
+            hopper.flush132();
+        }
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.BACK)) {
+            hopper.toPos(CarouselPosition.zeroPos);
+        }
+
+        /// Intaking
+        if (Gamepad2.wasJustPressed((GamepadKeys.Button.RIGHT_BUMPER))) {
+            hopper.setCounter(hopper.getCounter() + 1);
+            hopper.toPos(CarouselPosition.halfwayPosition(hopper.getCounter()));
+        }
+        if (Gamepad2.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+            hopper.toPos(CarouselPosition.servoPosition(hopper.getCounter()));
         }
 
         // Automation carousel rotation
-//        if (autoMode.isTrue()) {
-//            if (hopper.distance <= CarouselPosition.distanceMax) {
-//                if (!sensorUpdated) {
-//                    hopper.setCounter(hopper.getCounter() + 1);
-//
-//                    sensorUpdated = true;
-//                }
-//                ballColor = ColorConstants.detectColor(rgb);
-//            } else {
-//                sensorUpdated = false;
-//                ballColor = ColorConstants.BallColor.NULL;
-//            }
-//        }
+        /*
+        if (autoMode.isTrue()) {
+            if (hopper.distance <= CarouselPosition.distanceMax) {
+                if (!sensorUpdated) {
+                    hopper.setCounter(hopper.getCounter() + 1);
 
+                    sensorUpdated = true;
+                }
+                ballColor = ColorConstants.detectColor(rgb);
+            } else {
+                sensorUpdated = false;
+                ballColor = ColorConstants.BallColor.NULL;
+            }
+        }
+         */
+
+
+        telemetry.addLine("------------------------------");
+        telemetry.addData("CPos", CarouselPosition.servoPosition(hopper.getCounter()));
         telemetry.addLine("------------------------------");
         telemetry.addData("Counter", hopper.getCounter());
         telemetry.addData("Servo Position", hopper.getPosDouble());
@@ -130,6 +159,7 @@ public class Main extends OpMode {
         telemetry.addData("Heading", drivebase.odo.getHeading(AngleUnit.DEGREES));
         telemetry.addLine("------------------------------");
         telemetry.addData("Automated Carousel", autoMode.isTrue());
+        telemetry.addData("Zero Pos On", zeroPos.isTrue());
         telemetry.addData("Distance", hopper.distance);
         telemetry.update();
     }
