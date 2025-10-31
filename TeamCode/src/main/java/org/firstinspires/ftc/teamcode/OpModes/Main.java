@@ -103,6 +103,11 @@ public class Main extends OpMode {
         double speedMultiplier = 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
 
         drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, -1);
+
+        if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+
+        }
+
 //        drivebase.DriveFieldCentricWithLock(cX * speedMultiplier, cY * speedMultiplier, cRX, cRY);
 
         // Controls for the hopper. LB cycles it left, RB cycles it right a single time.
