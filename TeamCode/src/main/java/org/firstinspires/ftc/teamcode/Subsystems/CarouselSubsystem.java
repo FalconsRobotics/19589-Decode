@@ -38,9 +38,10 @@ public class CarouselSubsystem extends SubsystemBase {
     private RevColorSensorV3 sensor;
     private LEDSubsystem led;
     private int counter;
-    public boolean inOne, inTwo, inThree;
+    public boolean inOne, inTwo, inThree, testBool;
     public Ball ball1, ball2, ball3;
     public double distance;
+    private int flush132C = 0;
 
     /// Initialize Carousel Components with Constructors
     public CarouselSubsystem(HardwareMap map) {
@@ -74,15 +75,37 @@ public class CarouselSubsystem extends SubsystemBase {
 
     // Functions to be run every loop.
     public void periodic() {
-        this.toPos(CarouselPosition.servoPosition(this.getCounter()));
+        //this.toPos(CarouselPosition.servoPosition(this.getCounter()));
+
+        this.updateBallPositions();
         this.updateLEDColors();
         this.limitCounter();
         this.distance = this.getDistance();
     }
 
+    public boolean allOccupied() {
+        return (this.inOne && this.inTwo && this.inThree);
+    }
+
+    public void flush132() {
+        if (flush132C < 10) {
+            flush132C += 1;
+            carousel.setPosition(getPosDouble() + 0.004);
+        }
+        else {
+            carousel.setPosition(getPosDouble() - 0.01);
+            flush132C = 0;
+        }
+    }
+
     /// Returns Raw Position of Carousel Servo
     public double getPosDouble() {
         return carousel.getPosition();
+    }
+
+    public void intakeBall() {
+        carousel.setPosition(carousel.getPosition() - CarouselPosition.test);
+        toPos(CarouselPosition.servoPosition(counter) + CarouselPosition.test);
     }
 
     /// Returns which 'capsule' is at the Intake hole
@@ -121,6 +144,17 @@ public class CarouselSubsystem extends SubsystemBase {
             this.ball2.setPosition(3);
         }
 
+    }
+    public void updateBallPositions() {
+        if (atPosInt(1)) {
+           inOne = (this.getDistance() <= CarouselPosition.distanceMax);
+        }
+        else if (atPosInt(2)) {
+            inTwo = (this.getDistance() <= CarouselPosition.distanceMax);
+        }
+        else if (atPosInt(3)) {
+            inThree = (this.getDistance() <= CarouselPosition.distanceMax);
+        }
     }
     public void updateLEDColors() {
         double b1c, b2c, b3c;
@@ -171,6 +205,11 @@ public class CarouselSubsystem extends SubsystemBase {
     /// Sets position of carousel servo
     public void toPos(double p) {
         carousel.setPosition(p);
+    }
+
+    /// counter
+    public void toPosCounter() {
+        carousel.setPosition(CarouselPosition.servoPosition(counter));
     }
 
     /// Returns distance from Color Sensor

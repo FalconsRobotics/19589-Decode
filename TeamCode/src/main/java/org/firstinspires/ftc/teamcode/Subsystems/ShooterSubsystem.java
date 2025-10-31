@@ -5,15 +5,19 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
 
 public class ShooterSubsystem {
     private final DcMotorEx extakeMotor;
     private final RevBlinkinLedDriver ledStrip;
+    private LEDSubsystem led;
 
     public ShooterSubsystem(HardwareMap map) {
         // Setup the motor, set its direction correctly.
@@ -21,6 +25,7 @@ public class ShooterSubsystem {
         extakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         ledStrip = map.get(RevBlinkinLedDriver.class, "LEDStrip");
+        led = new LEDSubsystem(map);
 
         // For PID, we want the motor to use the encoder, allowing it to
         // use it the built-in velocity control that comes with DcMotorEx.
@@ -42,8 +47,9 @@ public class ShooterSubsystem {
     }
 
     /// Functions to be run every frame.
-    public void periodic() {
-        setStripColor();
+    public void periodic(Gamepad gp) {
+        setLEDColor();
+        rumbleController(gp);
     }
 
     /// Checks whether the shooter motor is in the correct power
@@ -63,11 +69,14 @@ public class ShooterSubsystem {
         extakeMotor.setVelocity(speed * 60 / ShooterConstants.MOTOR_RPMS);
     }
 
-    public void setStripColor() {
-        ledStrip.setPattern(
-                isInPowerBand() ?
-                        RevBlinkinLedDriver.BlinkinPattern.GREEN :
-                        RevBlinkinLedDriver.BlinkinPattern.LARSON_SCANNER_RED);
+    public void setLEDColor() {
+        led.setLedColor(3, (isInPowerBand()? ColorConstants.GREEN : ColorConstants.RED));
+    }
+
+    public void rumbleController (Gamepad gp) {
+        if (isInPowerBand()) {
+            gp.rumble(500);
+        }
     }
 
     /// Returns the motor velcoity in specified units
