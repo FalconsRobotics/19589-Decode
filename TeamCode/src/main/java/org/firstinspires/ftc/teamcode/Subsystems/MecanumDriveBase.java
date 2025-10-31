@@ -14,7 +14,7 @@ public class MecanumDriveBase {
     public GoBildaPinpointDriver odo;
 
     double currentForwardPower = 0.0;
-    double targetHeading = 0.0;
+    Double targetHeading = 0.0;
 
     public MecanumDriveBase(HardwareMap map) {
         // Initialize the motors. Change motor names if necessary.
@@ -68,6 +68,22 @@ public class MecanumDriveBase {
         }
 
         currentForwardPower += powerDifference;
+
+        double turnPower;
+        if (targetHeading != null) {
+            double currentHeading = odo.getHeading(AngleUnit.DEGREES);
+            double headingError = AngleUnit.normalizeDegrees(targetHeading - currentHeading);
+
+            if (Math.abs(headingError) <= DriveConstants.HEADING_KP) {
+                turnPower = 0.0;
+            } else {
+                turnPower = headingError * DriveConstants.HEADING_KP;
+            }
+
+            turnPower = Range.clip(turnPower, -1.0, 1.0);
+        } else {
+            turnPower = a;
+        }
 
         double denominator = Math.max(Math.abs(currentForwardPower) + Math.abs(x) + Math.abs(a), 1);
         frontLeft.setPower((currentForwardPower + x + a) / denominator);
