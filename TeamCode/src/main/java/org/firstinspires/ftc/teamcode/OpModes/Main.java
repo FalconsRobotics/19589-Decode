@@ -41,6 +41,8 @@ public class Main extends OpMode {
     ColorConstants.RGB rgb = new ColorConstants.RGB(0,0,0);
     ColorConstants.BallColor ballColor = ColorConstants.BallColor.NULL;
 
+    double basketAngle = 0.0;
+
     @Override public void init() {
         // Set up the various subsystems.
         // TODO: When adding commands, add in SubsystemsCollection
@@ -95,7 +97,22 @@ public class Main extends OpMode {
         drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, -1);
 
         if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+            drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, 0);
+        } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+            drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, 180);
+        } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+            drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, 90);
+        } else if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+            drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, 270);
+        }
 
+        if (Gamepad1.wasJustPressed(GamepadKeys.Button.OPTIONS)) {
+            telemetry.speak("Set Angle");
+            this.basketAngle = drivebase.odo.getHeading(AngleUnit.DEGREES);
+        }
+
+        if (Gamepad1.wasJustPressed(GamepadKeys.Button.START)) {
+            drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, basketAngle);
         }
 
 //        drivebase.DriveFieldCentricWithLock(cX * speedMultiplier, cY * speedMultiplier, cRX, cRY);
