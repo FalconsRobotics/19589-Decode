@@ -85,11 +85,12 @@ public class MecanumDriveBase {
             turnPower = a;
         }
 
-        double denominator = Math.max(Math.abs(currentForwardPower) + Math.abs(x) + Math.abs(a), 1);
-        frontLeft.setPower((currentForwardPower + x + a) / denominator);
-        frontRight.setPower((currentForwardPower - x - a) / denominator);
-        backLeft.setPower((currentForwardPower - x + a) / denominator);
-        backRight.setPower((currentForwardPower + x - a) / denominator);
+        // IF YOU WANT TO GET RID OF THE BROKEN SNAP TO HEADING, SWAP TURNPOWER FOR A IN THESE NEXT LINES
+        double denominator = Math.max(Math.abs(currentForwardPower) + Math.abs(x) + Math.abs(turnPower), 1);
+        frontLeft.setPower((currentForwardPower + x + turnPower) / denominator);
+        frontRight.setPower((currentForwardPower - x - turnPower) / denominator);
+        backLeft.setPower((currentForwardPower - x + turnPower) / denominator);
+        backRight.setPower((currentForwardPower + x - turnPower) / denominator);
     }
 
     /// Drive using field-centric mode. SolversLib does implement this themselves, but I would like
