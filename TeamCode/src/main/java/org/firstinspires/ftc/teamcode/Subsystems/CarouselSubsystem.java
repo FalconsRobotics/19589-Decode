@@ -78,7 +78,7 @@ public class CarouselSubsystem extends SubsystemBase {
         //this.toPos(CarouselPosition.servoPosition(this.getCounter()));
 
         this.updateBallPositions();
-        this.updateLEDColors();
+        //this.updateLEDColors();
         this.limitCounter();
         this.distance = this.getDistance();
     }
@@ -101,6 +101,13 @@ public class CarouselSubsystem extends SubsystemBase {
     /// Returns Raw Position of Carousel Servo
     public double getPosDouble() {
         return carousel.getPosition();
+    }
+
+    public void toPos14() {
+        carousel.setPosition(getPosDouble() + (0.2/3.0 * 3.0/4.0));
+    }
+    public void toPos34() {
+        carousel.setPosition(getPosDouble() + (0.2/3.0 * 1.0/4.0));
     }
 
     public void intakeBall() {

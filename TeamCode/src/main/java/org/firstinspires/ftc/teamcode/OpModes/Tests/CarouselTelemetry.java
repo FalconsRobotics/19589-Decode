@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Constants.CarouselPosition;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
 
+@Disabled
 @TeleOp(name = "Telemetry Carousel")
 public class CarouselTelemetry extends LinearOpMode {
 

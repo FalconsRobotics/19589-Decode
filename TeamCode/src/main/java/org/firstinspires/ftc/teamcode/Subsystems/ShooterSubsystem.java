@@ -18,6 +18,7 @@ public class ShooterSubsystem {
     private final DcMotorEx extakeMotor;
     private final RevBlinkinLedDriver ledStrip;
     private LEDSubsystem led;
+    public boolean farSpeed = true;
 
     public ShooterSubsystem(HardwareMap map) {
         // Setup the motor, set its direction correctly.
@@ -70,7 +71,7 @@ public class ShooterSubsystem {
     }
 
     public void setLEDColor() {
-        led.setLedColor(3, (isInPowerBand()? ColorConstants.GREEN : ColorConstants.RED));
+        //led.setLedColor(3, (isInPowerBand()? ColorConstants.GREEN : ColorConstants.RED));
     }
 
     public void rumbleController (Gamepad gp) {

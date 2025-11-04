@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,6 +14,8 @@ import org.firstinspires.ftc.teamcode.Constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.Constants.ShooterConstants;
 import org.firstinspires.ftc.teamcode.Subsystems.CarouselSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeElevatorSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.LEDSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveBase;
 import org.firstinspires.ftc.teamcode.Subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.ControllerSubsystem;
@@ -29,6 +33,7 @@ public class Main extends OpMode {
     IntakeElevatorSubsystem intake;
     CarouselSubsystem hopper;
     ShooterSubsystem shooter;
+    LEDSubsystem led;
 
     // Here, we decided to use SolversLib's GamepadEx controller for its
     // "whenJustPressed()" and "isDown()" functionality to maintain simplicity.
@@ -36,10 +41,14 @@ public class Main extends OpMode {
     GamepadEx Gamepad2;
     ControllerSubsystem.Toggle autoMode, zeroPos;
 
+    LimelightSubsystem ll;
+
     // Distance sensor variable
     public boolean sensorUpdated = false;
+    public double teamColor = ColorConstants.GREEN;
     ColorConstants.RGB rgb = new ColorConstants.RGB(0,0,0);
     ColorConstants.BallColor ballColor = ColorConstants.BallColor.NULL;
+    ColorConstants.Pattern.CyclicGradient cycle= new ColorConstants.Pattern.CyclicGradient(ColorConstants.RED);
 
     @Override public void init() {
         // Set up the various subsystems.
@@ -48,6 +57,9 @@ public class Main extends OpMode {
         intake = new IntakeElevatorSubsystem(hardwareMap);
         hopper = new CarouselSubsystem(hardwareMap);
         shooter = new ShooterSubsystem(hardwareMap);
+        led = new LEDSubsystem(hardwareMap);
+
+        ll = new LimelightSubsystem(hardwareMap);
 
         // Initialize the Gamepads for use from SolversLib.
         Gamepad1 = new GamepadEx(gamepad1);
@@ -60,11 +72,21 @@ public class Main extends OpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
+
+        shooter.setPower(ShooterConstants.FIRING_SPEED_SHORT);
+        shooter.farSpeed = false;
     }
 
     @Override public void init_loop() {
-        if (Gamepad2.isDown(GamepadKeys.Button.A) || Gamepad1.isDown(GamepadKeys.Button.A)) {
-            hopper.toPos(CarouselPosition.halfwayPosition(0));
+        Gamepad2.readButtons();
+        hopper.setCounter(1);
+        hopper.toPos(CarouselPosition.servoPosition(hopper.getCounter()));
+
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+            teamColor = ColorConstants.RED;
+        }
+        else if (Gamepad2.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            teamColor = ColorConstants.BLUE;
         }
     }
 
@@ -74,6 +96,18 @@ public class Main extends OpMode {
         drivebase.periodic();
         hopper.periodic();
         shooter.periodic(gamepad2);
+
+        led.setLedColor(0, cycle.getNextPosition(ColorConstants.GREEN, ColorConstants.SAGE));
+        if (shooter.farSpeed) {
+            led.setLedColor(1, ColorConstants.ORANGE);
+        }
+        else {
+            led.setLedColor(1, ColorConstants.VIOLET);
+        }
+
+        led.setLedColor(0, teamColor);
+        led.setLedColor(2, teamColor);
+
 
         // Read out Color Sensor values
         rgb.setRGB(hopper.colorSensorRed(), hopper.colorSensorGreen(), hopper.colorSensorBlue());
@@ -87,10 +121,18 @@ public class Main extends OpMode {
         //if(Gamepad2.wasJustPressed(GamepadKeys.Button.BACK)) {zeroPos.toggle();}
 
         // Subsystem control
-        shooter.setPower(ShooterConstants.FIRING_SPEED);
+        shooter.setPower(shooter.farSpeed ? ShooterConstants.FIRING_SPEED_LONG : ShooterConstants.FIRING_SPEED_SHORT);
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {  shooter.farSpeed = false;  }
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) { shooter.farSpeed = true; }
 
         //Shutoff intake when carousel is full
-        intake.setPower(1.0);
+        if (Gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.5) {
+            intake.setPower(-1);
+        } else {
+            intake.setPower(1);
+        }
+
+
 
         // Gather joystick values from LX, LY (inverted, so up is forward y),
         // and RX (for turning) on Gamepad1.
@@ -100,13 +142,9 @@ public class Main extends OpMode {
         double cRY = -Gamepad1.getRightY();
 
         double turnAngle = Math.atan2(cRX, cRY);
-        double speedMultiplier = 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        double speedMultiplier = 1 - (Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) * 0.7);
 
-        drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX, -1);
-
-        if (Gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-
-        }
+        drivebase.Drive(cX * speedMultiplier, cY * speedMultiplier, cRX * speedMultiplier, -1);
 
 //        drivebase.DriveFieldCentricWithLock(cX * speedMultiplier, cY * speedMultiplier, cRX, cRY);
 
@@ -116,7 +154,7 @@ public class Main extends OpMode {
             hopper.setCounter(hopper.getCounter() - 1);
             hopper.toPos(hopper.getPosDouble() - 0.07);
         }
-        if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+        if (Gamepad2.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
             hopper.setCounter(0);
             hopper.toPosCounter();
         }
@@ -130,29 +168,34 @@ public class Main extends OpMode {
         /// Intaking
         if (Gamepad2.wasJustPressed((GamepadKeys.Button.RIGHT_BUMPER))) {
             hopper.setCounter(hopper.getCounter() + 1);
-            hopper.toPos(CarouselPosition.halfwayPosition(hopper.getCounter()));
-        }
-        if (Gamepad2.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
             hopper.toPos(CarouselPosition.servoPosition(hopper.getCounter()));
         }
+        /*if (Gamepad2.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+            hopper.setCounter(hopper.getCounter() + 1);
+            hopper.toPos(CarouselPosition.servoPosition(hopper.getCounter()));
+        }*/
 
-        // Automation carousel rotation
-        /*
-        if (autoMode.isTrue()) {
-            if (hopper.distance <= CarouselPosition.distanceMax) {
-                if (!sensorUpdated) {
-                    hopper.setCounter(hopper.getCounter() + 1);
 
-                    sensorUpdated = true;
-                }
-                ballColor = ColorConstants.detectColor(rgb);
-            } else {
-                sensorUpdated = false;
-                ballColor = ColorConstants.BallColor.NULL;
-            }
+
+        telemetry.addLine("---------- COACH ----------");
+        telemetry.addLine();
+        telemetry.addData("Shooting Position", (shooter.farSpeed ? "FAR" : "CLOSE"));
+        telemetry.addLine();
+        telemetry.addData("Shooter Velocity", shooter.getVelocity());
+        telemetry.addLine();
+
+        if (teamColor == ColorConstants.RED) {
+            telemetry.addData("Angle to RED", ll.angleToGoalRed());
+        } else if (teamColor == ColorConstants.BLUE) {
+            telemetry.addData("Angle to BLUE", ll.angleToGoalBlue());
         }
-         */
 
+        telemetry.addLine("--- LOOK UP HERE TEIGAN ---");
+
+        telemetry.addLine();
+        telemetry.addLine();
+        telemetry.addLine();
+        telemetry.addLine();
 
         telemetry.addLine("------------------------------");
         telemetry.addData("CPos", CarouselPosition.servoPosition(hopper.getCounter()));
@@ -160,7 +203,6 @@ public class Main extends OpMode {
         telemetry.addData("Counter", hopper.getCounter());
         telemetry.addData("Servo Position", hopper.getPosDouble());
         telemetry.addLine("------------------------------");
-        telemetry.addData("Shooter Velocity", shooter.getVelocity());
         telemetry.addData("Heading", drivebase.odo.getHeading(AngleUnit.DEGREES));
         telemetry.addLine("------------------------------");
         telemetry.addData("Automated Carousel", autoMode.isTrue());
