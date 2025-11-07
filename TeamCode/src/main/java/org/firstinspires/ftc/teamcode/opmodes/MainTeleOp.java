@@ -14,19 +14,28 @@ import java.util.function.DoubleSupplier;
 
 @TeleOp(name = "TeleOp - Open Warfare")
 public class MainTeleOp extends CommandOpMode {
+    // Objects to store our subsystems.
     public DrivebaseSubsystem drive;
 
+    // Objects to store our Gamepads, using the SolversLib GamepadEx to take advantage
+    // of its conveniences for tracking button presses.
     GamepadEx Gamepad1, Gamepad2;
 
     @Override
     public void initialize() {
+        // Initialize our subsystems by passing in the HardwareMap, so they can each initialize
+        // their own motors, servos, etc.
         drive = new DrivebaseSubsystem(hardwareMap);
 
+        // Intialize our gamepads by passing in the existing built-in FTC gamepad objects.
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
 
+        // Tell SolversLib that this OpMode needs the DrivebaseSubsystem to function.
         register(drive);
 
+        // When no other Command needs the drivebase, we want it to automatically drive in
+        // robot-centric mode.
         drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX));
 
         DoubleSupplier fieldForwardSupplier = () -> {
@@ -40,9 +49,9 @@ public class MainTeleOp extends CommandOpMode {
 
         DoubleSupplier fieldStrafeSupplier = () -> {
             if (Gamepad1.getButton(GamepadKeys.Button.DPAD_LEFT)) {
-                return 1.0; // Negative is left
+                return 1.0;
             } else if (Gamepad1.getButton(GamepadKeys.Button.DPAD_RIGHT)) {
-                return -1.0; // Positive is right
+                return -1.0;
             }
             return 0.0;
         };
