@@ -15,13 +15,13 @@ public class FieldDriveCommand extends CommandBase {
     private final DoubleSupplier strafePower;
     private final DoubleSupplier turnPower;
 
-    public FieldDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier strafeSupplied, DoubleSupplier forwardSupplied, DoubleSupplier turnSupplied) {
+    public FieldDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedForward, DoubleSupplier suppliedTurn) {
         // Set the internal members to our passed-in values, so that this command uses the inputs
         // and subsystems from our OpMode.
         this.drive = suppliedDrive;
-        this.forwardPower = forwardSupplied;
-        this.strafePower = strafeSupplied;
-        this.turnPower = turnSupplied;
+        this.forwardPower = suppliedForward;
+        this.strafePower = suppliedStrafe;
+        this.turnPower = suppliedTurn;
 
         // Tell SolversLib that we need to use the DrivebaseSubsystem in this command.
         addRequirements(this.drive);

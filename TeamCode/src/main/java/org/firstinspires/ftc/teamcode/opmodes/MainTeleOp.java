@@ -109,7 +109,8 @@ public class MainTeleOp extends CommandOpMode {
         //endregion
     }
 
-    // Might not be necessary, as the OpMode already runs as-is.
+    // Might not be necessary, as the OpMode already runs as-is. Should not run more than
+    // its super function.
     @Override
     public void run() {
         super.run();
