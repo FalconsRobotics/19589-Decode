@@ -25,12 +25,18 @@ public class DrivebaseSubsystem extends SubsystemBase {
     // Object to hold a PID controller that we will use to rotate the robot.
     public PIDFController turnPID;
 
+    private double lastForwardMovement = 0.0;
+
+    /**
+     * Initialize the DrivebaseSubsystem.
+     * @param map Uses the HardwareMap from your Auto/TeleOp to intiailize all of the hardware.
+     */
     public DrivebaseSubsystem(HardwareMap map) {
         // Initialize the four Mecanum wheel motors.
-        frontLeftMotor = map.get(MotorEx.class, "FrontLeft");
-        frontLeftMotor = map.get(MotorEx.class, "FrontRight");
-        frontLeftMotor = map.get(MotorEx.class, "BackLeft");
-        frontLeftMotor = map.get(MotorEx.class, "BackRight");
+        frontLeftMotor = new MotorEx(map, "FrontLeft");
+        frontRightMotor = new MotorEx(map, "FrontRight");
+        backLeftMotor = new MotorEx(map, "BackLeft");
+        backRightMotor = new MotorEx(map, "BackRight");
 
         // Create the SolversLib MecanumDrive object from those four motors.
         drivebase = new MecanumDrive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
@@ -45,6 +51,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
         odo.resetPosAndIMU();
 
         // Initialize the PID controller for turning the robot.
+        // These PIDF values are pulled from a seperate Constants file.
         turnPID = new PIDFController(
                 DriveConstants.DRIVE_KP,
                 DriveConstants.DRIVE_KI,
@@ -61,7 +68,21 @@ public class DrivebaseSubsystem extends SubsystemBase {
      * @param cA The a-value taken from the gamepad, used for rotation.
      */
     public void drive(double cX, double cY, double cA) {
-        drivebase.driveRobotCentric(cX, cY, cA);
+        // Call the SolversLib robot-centric driving function using the supplied controller values.
+
+        double change = cY - this.lastForwardMovement;
+
+        if (change > DriveConstants.MAX_ACCEL_CHANGE) {
+            change = DriveConstants.MAX_ACCEL_CHANGE;
+        } else if (change < -DriveConstants.MAX_ACCEL_CHANGE) {
+            change = -DriveConstants.MAX_ACCEL_CHANGE;
+        }
+
+        double limitedForward = this.lastForwardMovement + change;
+
+        drivebase.driveRobotCentric(cX, limitedForward, cA);
+
+        this.lastForwardMovement = limitedForward;
     }
 
     /**
@@ -74,7 +95,23 @@ public class DrivebaseSubsystem extends SubsystemBase {
     public void driveFieldCentric(double cX, double cY, double cA) {
         // odo.getHeading() retrieves the current heading from the Pinpoint computer.
         // The SolversLib function requires degrees, so that's what we'll use.
-        drivebase.driveFieldCentric(cX, cY, cA, odo.getHeading(AngleUnit.DEGREES));
+
+        double headingRad = odo.getHeading(AngleUnit.RADIANS);
+        double robotForward = cY * Math.cos(headingRad) + cX * Math.sin(headingRad);
+        double robotStrafe = cY * -Math.sin(headingRad) + cX * Math.cos(headingRad);
+
+        double change = robotForward - this.lastForwardMovement;
+        if (change > DriveConstants.MAX_ACCEL_CHANGE) {
+            change = DriveConstants.MAX_ACCEL_CHANGE;
+        } else if (change < -DriveConstants.MAX_ACCEL_CHANGE) {
+            change = -DriveConstants.MAX_ACCEL_CHANGE;
+        }
+
+        double limitedForward = this.lastForwardMovement + change;
+
+        drivebase.driveFieldCentric(cX, limitedForward, cA, odo.getHeading(AngleUnit.DEGREES));
+
+        this.lastForwardMovement = limitedForward;
     }
 
     /**
@@ -86,11 +123,16 @@ public class DrivebaseSubsystem extends SubsystemBase {
      * @param lockHeading A custom heading to lock the drivebase to.
      */
     public void driveFieldCentricHeadingLock(double cX, double cY, double lockHeading) {
+        // Pull our current heading in degrees from the Pinpoint
         double currentHeading = odo.getHeading(AngleUnit.DEGREES);
 
+        // Calculate the error between the desired heading and the current heading, limit
+        // it from -180 to 180 degrees, and calculate the turn power required to turn to
+        // that heading.
         double error = AngleUnit.normalizeDegrees(lockHeading - currentHeading);
         double turnPower = turnPID.calculate(-error);
 
+        // Call the SolversLib field-centric driving function with the calculated turn power.
         drivebase.driveFieldCentric(cX, cY, turnPower, currentHeading);
     }
 }

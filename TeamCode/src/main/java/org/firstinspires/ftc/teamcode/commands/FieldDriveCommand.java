@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
 
 import java.util.function.DoubleSupplier;
 
-public class RobotDriveCommand extends CommandBase {
+public class FieldDriveCommand extends CommandBase {
     // An object used to reference our existing Drivebase, pulled from the constructor,
     // which gets the subsystem from our OpMode.
     private final DrivebaseSubsystem drive;
@@ -15,7 +15,7 @@ public class RobotDriveCommand extends CommandBase {
     private final DoubleSupplier strafePower;
     private final DoubleSupplier turnPower;
 
-    public RobotDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier forwardSupplied, DoubleSupplier strafeSupplied, DoubleSupplier turnSupplied) {
+    public FieldDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier forwardSupplied, DoubleSupplier strafeSupplied, DoubleSupplier turnSupplied) {
         // Set the internal members to our passed-in values, so that this command uses the inputs
         // and subsystems from our OpMode.
         this.drive = suppliedDrive;
@@ -30,6 +30,6 @@ public class RobotDriveCommand extends CommandBase {
     @Override
     public void execute() {
         // Call the DrivebaseSubsystem drive function using our supplied movement values.
-        this.drive.drive(-strafePower.getAsDouble(), -forwardPower.getAsDouble(), -turnPower.getAsDouble());
+        this.drive.driveFieldCentric(strafePower.getAsDouble(), -forwardPower.getAsDouble(), -turnPower.getAsDouble());
     }
 }
