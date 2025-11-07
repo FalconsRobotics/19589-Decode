@@ -17,13 +17,14 @@ public class TestFindClosestBall extends LinearOpMode {
         // --- Initialize once ---
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(6); // Ensure this is your SnapScript pipeline index
+        limelight.pipelineSwitch(3); // Ensure this is your SnapScript pipeline index
         limelight.start();
 
         telemetry.addLine("Limelight initialized. Waiting for start...");
         telemetry.update();
 
         waitForStart();
+        limelight.start();
 
         while (opModeIsActive()) {
             limelight.start();
