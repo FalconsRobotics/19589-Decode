@@ -34,11 +34,20 @@ public class MainTeleOp extends CommandOpMode {
         // Tell SolversLib that this OpMode needs the DrivebaseSubsystem to function.
         register(drive);
 
+        //region Robot-Centric Driving Code
+        /// ==================================================
+
         // When no other Command needs the drivebase, we want it to automatically drive in
         // robot-centric mode. We pass in our drivebase so that the RobotDriveCommand knows
         // what drivebase to use, and we pass in DoubleSuppliers for direct access to our
         // Gamepad joystick values.
         drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX));
+
+        /// ==================================================
+        //endregion
+
+        //region Field-Centric Driving Code
+        /// ==================================================
 
         // SolversLib wants us to use DoubleSuppliers when passing in input values into our
         // commands, so that's what we're doing here. This is a fancy way of saying:
@@ -92,6 +101,12 @@ public class MainTeleOp extends CommandOpMode {
                         () -> 0.0
                 )
         );
+
+        /// ==================================================
+        //endregion
+
+        //region Intake Control
+        //endregion
     }
 
     // Might not be necessary, as the OpMode already runs as-is.

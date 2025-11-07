@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
@@ -11,19 +10,24 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
 
+/**
+ * The subsystem class for our drivebase. Holds motor objects for each wheel,
+ * objects for our GoBildaPinpoint IMU computer, a PIDF controller for robot
+ * rotation, and functions for driving the robot in various modes.
+ */
 public class DrivebaseSubsystem extends SubsystemBase {
     // Motor objects that store the references to the motors on the robot.
-    public MotorEx frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
+    private final MotorEx frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
 
     // This is the MecanumDrive built into SolversLib, and we'll be relying on its
     // built-in functions.
-    public MecanumDrive drivebase;
+    private final MecanumDrive drivebase;
 
     // Object to store the GoBildaPinpointDriver IMU.
-    public GoBildaPinpointDriver odo;
+    private final GoBildaPinpointDriver odo;
 
     // Object to hold a PID controller that we will use to rotate the robot.
-    public PIDFController turnPID;
+    private final PIDFController turnPID;
 
     // A private variable that tracks our acceleration across OpMode frames. Used
     // for a slew rate controller to prevent our robot from tipping when moving
