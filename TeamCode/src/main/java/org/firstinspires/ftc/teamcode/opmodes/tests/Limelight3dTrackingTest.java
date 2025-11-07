@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.tests;
 
 // Import FTC and hardware classes for Limelight and GoBilda Pinpoint odometry
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
