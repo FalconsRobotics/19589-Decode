@@ -15,7 +15,7 @@ public class FieldDriveCommand extends CommandBase {
     private final DoubleSupplier strafePower;
     private final DoubleSupplier turnPower;
 
-    public FieldDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier forwardSupplied, DoubleSupplier strafeSupplied, DoubleSupplier turnSupplied) {
+    public FieldDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier strafeSupplied, DoubleSupplier forwardSupplied, DoubleSupplier turnSupplied) {
         // Set the internal members to our passed-in values, so that this command uses the inputs
         // and subsystems from our OpMode.
         this.drive = suppliedDrive;
