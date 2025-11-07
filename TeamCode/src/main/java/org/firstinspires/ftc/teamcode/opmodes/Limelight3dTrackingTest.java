@@ -1,4 +1,4 @@
-package old_do_not_touch.Tests;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -11,14 +11,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.teamcode.Subsystems.LimelightSubsystem;
 
-@Disabled
+
 @TeleOp(name = "Limelight 3d Testing - Teigan", group = "Test")
 public class Limelight3dTrackingTest extends LinearOpMode {
 
     Pose2D pose;
     LLResult result;
+
+    public void waitForStart(){
+
+    }
 
     public void runOpMode(){
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "limelight");
