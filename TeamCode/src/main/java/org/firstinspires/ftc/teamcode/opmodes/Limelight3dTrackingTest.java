@@ -19,15 +19,13 @@ public class Limelight3dTrackingTest extends LinearOpMode {
     Pose2D pose;
     LLResult result;
 
-    public void waitForStart(){
-
-    }
-
-    public void runOpMode(){
+    @Override
+    public void runOpMode() {
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "limelight");
         ll.pipelineSwitch(0);
         ll.setPollRateHz(67);
         ll.start();
+
         GoBildaPinpointDriver odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         odo.initialize();
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -35,18 +33,29 @@ public class Limelight3dTrackingTest extends LinearOpMode {
         odo.resetPosAndIMU();
         odo.recalibrateIMU();
 
-        result = ll.getLatestResult();
+        waitForStart();
 
-        double robotAngle = odo.getHeading(AngleUnit.DEGREES);
-        ll.updateRobotOrientation(robotAngle);
-        if (result != null && result.isValid()) {
-            Pose3D pose3d = result.getBotpose_MT2();
-            if (pose3d != null) {
-                Pose2D botpose_mt2 = new Pose2D(DistanceUnit.MM, pose3d.getPosition().x,pose3d.getPosition().y, AngleUnit.DEGREES, robotAngle);
-                telemetry.addData("MT2 Location:", "(" + botpose_mt2.getX(DistanceUnit.MM) + ", " + botpose_mt2.getY(DistanceUnit.MM) + ")");
+        // Optionally add a loop to continuously update telemetry while opmode is active
+        while (opModeIsActive()) {
+            result = ll.getLatestResult();
+            double robotAngle = odo.getHeading(AngleUnit.DEGREES);
+            ll.updateRobotOrientation(robotAngle);
+
+            if (result != null && result.isValid()) {
+                Pose3D pose3d = result.getBotpose_MT2();
+                if (pose3d != null) {
+                    Pose2D botpose_mt2 = new Pose2D(
+                            DistanceUnit.MM,
+                            pose3d.getPosition().x,
+                            pose3d.getPosition().y,
+                            AngleUnit.DEGREES,
+                            robotAngle
+                    );
+                    telemetry.addData("MT2 Location:",
+                            "(" + botpose_mt2.getX(DistanceUnit.MM) + ", " + botpose_mt2.getY(DistanceUnit.MM) + ")");
+                }
             }
+            telemetry.update();
         }
-        telemetry.update();
-
     }
 }
