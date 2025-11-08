@@ -65,7 +65,13 @@ public class VisionSubsystem extends SubsystemBase {
         return result.getTx();
     }
 
-    public double findMotif(){
+    /** returns the motif value*/
+    public int getMotif(){
+        return motif;
+    }
+
+    /** Finds the tag id and sets motif to value 1, 2, or 3 depending on tag. Motif value of 0 means no tag was detected*/
+    public void findMotif(){
         List<LLResultTypes.FiducialResult> fidRes = result.getFiducialResults();
 
         for(LLResultTypes.FiducialResult fid : fidRes){
@@ -80,8 +86,6 @@ public class VisionSubsystem extends SubsystemBase {
                 motif = 0;
             }
         }
-        //if it returns 0 it did not see a motif
-        return motif;
     }
 
     /** Best-available 2D field pose from MegaTag2 this loop, or last cached. Units: mm & deg. */
