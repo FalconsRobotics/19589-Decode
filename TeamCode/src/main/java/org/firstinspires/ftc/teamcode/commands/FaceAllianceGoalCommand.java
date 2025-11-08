@@ -4,6 +4,7 @@ import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -12,6 +13,7 @@ import java.util.function.DoubleSupplier;
 //while the robot automatically turns and locks in on the goal
 public class FaceAllianceGoalCommand extends CommandBase {
     private final DrivebaseSubsystem drive;
+    private final VisionSubsystem vision;
     private final DoubleSupplier x;     // strafe input (robot or field based; pass what your subsystem expects)
     private final DoubleSupplier y;     // forward input
     private final BooleanSupplier isRed;
@@ -22,10 +24,11 @@ public class FaceAllianceGoalCommand extends CommandBase {
     private final double deadbandDeg;
 
     public FaceAllianceGoalCommand(
-            DrivebaseSubsystem drive,
+            DrivebaseSubsystem drive, VisionSubsystem vision,
             DoubleSupplier x, DoubleSupplier y, BooleanSupplier isRed,
             double kP, double maxTurn, double tolDeg, double deadbandDeg) {
         this.drive = drive;
+        this.vision = vision;
         this.x = x;
         this.y = y;
         this.isRed = isRed;
@@ -44,7 +47,7 @@ public class FaceAllianceGoalCommand extends CommandBase {
         double forward = y.getAsDouble();
 
         // Vision angle (deg). Positive = target left of robot.
-        double angleDeg = drive.angleToAllianceGoal(isRed.getAsBoolean());
+        double angleDeg = vision.angleToAllianceGoal(isRed.getAsBoolean());
 
         double rotCmd = 0.0;
         if (!Double.isNaN(angleDeg)) {
@@ -58,7 +61,7 @@ public class FaceAllianceGoalCommand extends CommandBase {
         }
 
         // Use your preferred frame here:
-        this.drive.driveFieldCentric(strafe, forward, rotCmd);
+        this.drive.driveFieldCentricHeadingLock(strafe, forward, rotCmd);
     }
 
     @Override

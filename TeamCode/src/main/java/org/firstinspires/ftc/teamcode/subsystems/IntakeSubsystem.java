@@ -19,7 +19,8 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public IntakeSubsystem(HardwareMap map) {
         // Initialize the intake motor.
-        intakeMotor = new MotorEx(map, "Intake");
+        intakeMotor = new MotorEx(map, "IntakeMotor");
+        intakeMotor.setInverted(true);
 
         // Important! We want to make sure that we are able to only set the raw
         // power of the intake motor. We don't want any velocity or position

@@ -8,8 +8,13 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.FaceAllianceGoalCommand;
 import org.firstinspires.ftc.teamcode.commands.FieldDriveCommand;
+import org.firstinspires.ftc.teamcode.commands.IntakeSetPowerCommand;
+import org.firstinspires.ftc.teamcode.commands.PeriodicFunctionCommand;
 import org.firstinspires.ftc.teamcode.commands.RobotDriveCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -18,6 +23,9 @@ import java.util.function.DoubleSupplier;
 public class MainTeleOp extends CommandOpMode {
     // Objects to store our subsystems.
     public DrivebaseSubsystem drive;
+    public IntakeSubsystem intake;
+    public ShooterSubsystem shooter;
+    public VisionSubsystem vision;
 
     // Objects to store our Gamepads, using the SolversLib GamepadEx to take advantage
     // of its conveniences for tracking button presses.
@@ -26,19 +34,24 @@ public class MainTeleOp extends CommandOpMode {
     // Alliance for goal selection
     private boolean isRedAlliance = true; // default; change as you like
 
-
     @Override
     public void initialize() {
         // Initialize our subsystems by passing in the HardwareMap, so they can each initialize
         // their own motors, servos, etc.
         drive = new DrivebaseSubsystem(hardwareMap);
+        intake = new IntakeSubsystem(hardwareMap);
+        shooter = new ShooterSubsystem();
+        vision = new VisionSubsystem(hardwareMap, this.drive);
 
         // Intialize our gamepads by passing in the existing built-in FTC gamepad objects.
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
 
-        // Tell SolversLib that this OpMode needs the DrivebaseSubsystem to function.
-        register(drive);
+        // Tell SolversLib that this OpMode needs the drivebase and intake to function.
+        register(drive, intake);
+
+        // Schedule any commands that need to be repeated for the entire OpMode.
+        schedule(new PeriodicFunctionCommand(this.drive, this.intake, this.shooter, this.vision));
 
         //region Robot-Centric Driving Code
         /// ==================================================
@@ -47,7 +60,7 @@ public class MainTeleOp extends CommandOpMode {
         // robot-centric mode. We pass in our drivebase so that the RobotDriveCommand knows
         // what drivebase to use, and we pass in DoubleSuppliers for direct access to our
         // Gamepad joystick values.
-        drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX, Gamepad1::getRightY));
+        drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX));
 
         /// ==================================================
         //endregion
@@ -112,20 +125,33 @@ public class MainTeleOp extends CommandOpMode {
         //endregion
 
         //region Intake Control
+        /// ==================================================
+
+        // Set the default command for our intake (i.e. when no other commands are using it), we
+        // we want it to drive forward and suck balls in.
+        intake.setDefaultCommand(new IntakeSetPowerCommand(intake, () -> 1.0));
+
+        // If the Gamepad2 right trigger is more than half way down, we want to reverse the intake, by
+        // calling the same command.
+        if (Gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.5) {
+            new IntakeSetPowerCommand(intake, () -> -1.0);
+        }
+
+        /// ==================================================
         //endregion
 
         BooleanSupplier isRed = () -> isRedAlliance; // your toggle from earlier
 
-// Hold Right Trigger to aim-assist while freely translating
+        // Hold Right Trigger to aim-assist while freely translating
         new com.seattlesolvers.solverslib.command.button.Trigger(
                 () -> gamepad1.right_trigger > 0.4
         ).whileActiveContinuous(
                 new FaceAllianceGoalCommand(
-                        drive,
+                        drive, vision,
                         () -> gamepad1.left_stick_x,      // strafe
                         () -> -gamepad1.left_stick_y,     // forward (invert if needed)
                         isRed,
-                        0.02, 0.6, 1.0, 0.75
+                        0.01, 0.3, 1.0, 4
                 )
         );
 

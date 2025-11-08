@@ -15,16 +15,14 @@ public class RobotDriveCommand extends CommandBase {
     private final DoubleSupplier forwardPower;
     private final DoubleSupplier strafePower;
     private final DoubleSupplier turnPower;
-    private final DoubleSupplier speedMultiplier;
 
-    public RobotDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedForward, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedTurn, DoubleSupplier suppliedSpeed) {
+    public RobotDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedForward, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedTurn) {
         // Set the internal members to our passed-in values, so that this command uses the inputs
         // and subsystems from our OpMode.
         this.drive = suppliedDrive;
         this.forwardPower = suppliedForward;
         this.strafePower = suppliedStrafe;
         this.turnPower = suppliedTurn;
-        this.speedMultiplier = suppliedSpeed;
 
         // Tell SolversLib that we need to use the DrivebaseSubsystem in this command.
         addRequirements(this.drive);
@@ -33,6 +31,6 @@ public class RobotDriveCommand extends CommandBase {
     @Override
     public void execute() {
         // Call the DrivebaseSubsystem drive function using our supplied movement values.
-        this.drive.drive(-strafePower.getAsDouble() * this.speedMultiplier.getAsDouble(), -forwardPower.getAsDouble() * this.speedMultiplier.getAsDouble(), -turnPower.getAsDouble() * this.speedMultiplier.getAsDouble());
+        this.drive.drive(-strafePower.getAsDouble(), -forwardPower.getAsDouble(), -turnPower.getAsDouble());
     }
 }

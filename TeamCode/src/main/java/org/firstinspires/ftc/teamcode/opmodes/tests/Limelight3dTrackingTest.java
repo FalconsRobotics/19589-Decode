@@ -22,7 +22,6 @@ import java.util.List;
  *  - Your robot’s field position (via MegaTag2 pose)
  *  - Your angle to each visible AprilTag (goal tags)
  */
-@Disabled
 @TeleOp(name = "Limelight 3d Testing - Teigan", group = "Test")
 public class Limelight3dTrackingTest extends LinearOpMode {
 

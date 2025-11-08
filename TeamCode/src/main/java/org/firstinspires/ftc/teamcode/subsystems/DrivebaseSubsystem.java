@@ -26,25 +26,17 @@ import java.util.List;
  */
 public class DrivebaseSubsystem extends SubsystemBase {
     // Motor objects that store the references to the motors on the robot.
-    private final MotorEx frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
+    public final MotorEx frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
 
     // This is the MecanumDrive built into SolversLib, and we'll be relying on its
     // built-in functions.
-    private final MecanumDrive drivebase;
+    public final MecanumDrive drivebase;
 
     // Object to store the GoBildaPinpointDriver IMU.
-    private final GoBildaPinpointDriver odo;
+    public final GoBildaPinpointDriver odo;
 
     // Object to hold a PID controller that we will use to rotate the robot.
-    private final PIDFController turnPID;
-
-    public Limelight3A ll;
-    public LLResult result;
-    public Pose2D pose;
-
-    // Cached MT2 pose (for stable telemetry/fallback)
-    private Pose2D lastLLPose2d = null;
-    private long   lastLLPoseMillis = 0L;
+    public final PIDFController turnPID;
 
     // A private variable that tracks our acceleration across OpMode frames. Used
     // for a slew rate controller to prevent our robot from tipping when moving
@@ -83,129 +75,12 @@ public class DrivebaseSubsystem extends SubsystemBase {
                 DriveConstants.DRIVE_KF
         );
         turnPID.setSetPoint(0);
-
-        ll = map.get(Limelight3A.class, "limelight");
-        ll.setPollRateHz(60);
-        ll.pipelineSwitch(0);
-        ll.start();
     }
 
     @Override
     public void periodic() {
-        super.periodic();
-        result = ll.getLatestResult();
-        ll.updateRobotOrientation(odo.getHeading(AngleUnit.DEGREES));
-
-        // Cache most recent valid MT2 2D pose
-        if (result != null && result.isValid()) {
-            Pose3D mt2 = result.getBotpose_MT2();
-            if (mt2 != null) {
-                lastLLPose2d = new Pose2D(
-                        DistanceUnit.MM,
-                        mt2.getPosition().x,
-                        mt2.getPosition().y,
-                        AngleUnit.DEGREES,
-                        odo.getHeading(AngleUnit.DEGREES) // keep heading from odometry
-                );
-                lastLLPoseMillis = System.currentTimeMillis();
-            }
-        }
+        odo.update();
     }
-
-    // ----------------------------
-    // Limelight helpers (for commands/telemetry)
-    // ----------------------------
-
-    /** Best-available 2D field pose from MegaTag2 this loop, or last cached. Units: mm & deg. */
-    public Pose2D llPose() {
-        if (result != null && result.isValid()) {
-            Pose3D p3 = result.getBotpose_MT2();
-            if (p3 != null) {
-                return new Pose2D(
-                        DistanceUnit.MM,
-                        p3.getPosition().x,
-                        p3.getPosition().y,
-                        AngleUnit.DEGREES,
-                        odo.getHeading(AngleUnit.DEGREES)
-                );
-            }
-        }
-        return lastLLPose2d;
-    }
-
-    /** Age of the cached MT2 pose in milliseconds (Long.MAX_VALUE if none yet). */
-    public long llPoseAgeMillis() {
-        return (lastLLPoseMillis == 0) ? Long.MAX_VALUE : (System.currentTimeMillis() - lastLLPoseMillis);
-    }
-
-    /** Angle (deg, [-180,180]) from robot to the *closest* tag among preferred IDs. NaN if none visible. */
-    public double angleToGoal(int... preferredTagIds) {
-        if (result == null || !result.isValid()) return Double.NaN;
-        List<LLResultTypes.FiducialResult> fidRes = result.getFiducialResults();
-        if (fidRes == null || fidRes.isEmpty()) return Double.NaN;
-
-        boolean filter = (preferredTagIds != null && preferredTagIds.length > 0);
-        LLResultTypes.FiducialResult best = null;
-        double bestDistSq = Double.POSITIVE_INFINITY;
-
-        for (LLResultTypes.FiducialResult fr : fidRes) {
-            if (filter && Arrays.stream(preferredTagIds).noneMatch(id -> id == fr.getFiducialId()))
-                continue;
-
-            Pose3D p = fr.getTargetPoseRobotSpace();
-            if (p == null) p = fr.getTargetPoseCameraSpace();
-            if (p == null) continue;
-
-            double x = p.getPosition().x; // forward
-            double y = p.getPosition().y; // left
-            double d2 = x*x + y*y;
-
-            if (d2 < bestDistSq) {
-                bestDistSq = d2;
-                best = fr;
-            }
-        }
-
-        if (best == null) return Double.NaN;
-
-        Pose3D p = best.getTargetPoseRobotSpace();
-        if (p == null) p = best.getTargetPoseCameraSpace();
-
-        double x = p.getPosition().x; // forward
-        double y = p.getPosition().y; // left
-        double angleDeg = Math.toDegrees(Math.atan2(y, x));
-        // normalize to [-180, 180]
-        angleDeg = ((angleDeg + 180) % 360 + 360) % 360 - 180;
-        return angleDeg;
-    }
-
-    /** Convenience for FTC DECODE goals (edit IDs if your field differs). */
-    public double angleToAllianceGoal(boolean isRed) {
-        // Common mapping you mentioned previously: Red=20, Blue=24
-        return isRed ? angleToGoal(20) : angleToGoal(24);
-    }
-
-    // ----------------------------
-    // Heading/odometry access
-    // ----------------------------
-
-    public double getHeadingDegrees() {
-        return odo.getHeading(AngleUnit.DEGREES);
-    }
-
-    /** Resets Pinpoint pose & IMU (re-zeros heading & odometry). */
-    public void resetHeading() {
-        odo.resetPosAndIMU();
-        turnPID.reset();
-        turnPID.setSetPoint(0);
-    }
-
-    /** Optional: snap helper for button-driven heading locks (pairs with driveFieldCentricHeadingLock). */
-    public void snapHeadingDegrees(double headingDeg) {
-        turnPID.setSetPoint(0); // we pass error directly in driveFieldCentricHeadingLock
-        // no persistent lock here; the caller supplies lockHeading to the drive method below
-    }
-
 
     /**
      * Calls the SolversLib MecanumDrive driveRobotCentric() function. Uses a slew rate
