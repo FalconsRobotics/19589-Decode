@@ -89,8 +89,26 @@ public class VisionSubsystem extends SubsystemBase {
         }
     }
 
+    public Pose2D llPoseMT1(){
+        ll.pipelineSwitch(1);
+        if (result != null && result.isValid()) {
+            Pose3D p3 = result.getBotpose();
+            if (p3 != null) {
+                return new Pose2D(
+                        DistanceUnit.MM,
+                        p3.getPosition().x,
+                        p3.getPosition().y,
+                        AngleUnit.DEGREES,
+                        driveInstance.odo.getHeading(AngleUnit.DEGREES)
+                );
+            }
+        }
+        return lastLLPose2d;
+    }
+
     /** Best-available 2D field pose from MegaTag2 this loop, or last cached. Units: mm & deg. */
     public Pose2D llPose() {
+        ll.pipelineSwitch(1);
         if (result != null && result.isValid()) {
             Pose3D p3 = result.getBotpose_MT2();
             if (p3 != null) {
