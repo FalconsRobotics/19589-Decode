@@ -79,9 +79,9 @@ public class VisionSubsystem extends SubsystemBase {
             int id = fid.getFiducialId();
             if(id == 21){
                 motif = 1;
-            } else if(id == 2){
+            } else if(id == 22){
                 motif = 2;
-            } else if(id == 3){
+            } else if(id == 23){
                 motif = 3;
             } else {
                 motif = 0;
