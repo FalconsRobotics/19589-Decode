@@ -72,6 +72,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     /** Finds the tag id and sets motif to value 1, 2, or 3 depending on tag. Motif value of 0 means no tag was detected*/
     public void findMotif(){
+        ll.pipelineSwitch(0);
         List<LLResultTypes.FiducialResult> fidRes = result.getFiducialResults();
 
         for(LLResultTypes.FiducialResult fid : fidRes){
