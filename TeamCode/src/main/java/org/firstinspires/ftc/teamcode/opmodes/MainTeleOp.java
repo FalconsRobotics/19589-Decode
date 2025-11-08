@@ -6,10 +6,12 @@ import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.commands.FaceAllianceGoalCommand;
 import org.firstinspires.ftc.teamcode.commands.FieldDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.RobotDriveCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 @TeleOp(name = "TeleOp - Open Warfare")
@@ -20,6 +22,10 @@ public class MainTeleOp extends CommandOpMode {
     // Objects to store our Gamepads, using the SolversLib GamepadEx to take advantage
     // of its conveniences for tracking button presses.
     GamepadEx Gamepad1, Gamepad2;
+
+    // Alliance for goal selection
+    private boolean isRedAlliance = true; // default; change as you like
+
 
     @Override
     public void initialize() {
@@ -41,7 +47,7 @@ public class MainTeleOp extends CommandOpMode {
         // robot-centric mode. We pass in our drivebase so that the RobotDriveCommand knows
         // what drivebase to use, and we pass in DoubleSuppliers for direct access to our
         // Gamepad joystick values.
-        drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX));
+        drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX, Gamepad1::getRightY));
 
         /// ==================================================
         //endregion
@@ -107,6 +113,22 @@ public class MainTeleOp extends CommandOpMode {
 
         //region Intake Control
         //endregion
+
+        BooleanSupplier isRed = () -> isRedAlliance; // your toggle from earlier
+
+// Hold Right Trigger to aim-assist while freely translating
+        new com.seattlesolvers.solverslib.command.button.Trigger(
+                () -> gamepad1.right_trigger > 0.4
+        ).whileActiveContinuous(
+                new FaceAllianceGoalCommand(
+                        drive,
+                        () -> gamepad1.left_stick_x,      // strafe
+                        () -> -gamepad1.left_stick_y,     // forward (invert if needed)
+                        isRed,
+                        0.02, 0.6, 1.0, 0.75
+                )
+        );
+
     }
 
     // Might not be necessary, as the OpMode already runs as-is. Should not run more than

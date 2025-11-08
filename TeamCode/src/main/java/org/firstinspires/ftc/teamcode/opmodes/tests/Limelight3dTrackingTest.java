@@ -5,6 +5,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -21,6 +22,7 @@ import java.util.List;
  *  - Your robot’s field position (via MegaTag2 pose)
  *  - Your angle to each visible AprilTag (goal tags)
  */
+@Disabled
 @TeleOp(name = "Limelight 3d Testing - Teigan", group = "Test")
 public class Limelight3dTrackingTest extends LinearOpMode {
 
