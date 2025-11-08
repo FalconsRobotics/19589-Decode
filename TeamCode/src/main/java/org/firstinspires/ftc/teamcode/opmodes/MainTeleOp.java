@@ -7,9 +7,11 @@ import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.commands.FaceAllianceGoalCommand;
 import org.firstinspires.ftc.teamcode.commands.FieldDriveCommand;
+import org.firstinspires.ftc.teamcode.commands.FieldDriveLockCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeSetPowerCommand;
 import org.firstinspires.ftc.teamcode.commands.PeriodicFunctionCommand;
 import org.firstinspires.ftc.teamcode.commands.RobotDriveCommand;
@@ -61,6 +63,7 @@ public class MainTeleOp extends CommandOpMode {
                 telemetry.update();
                 telemetry.addData("Odo X", drive.odo.getPosX(DistanceUnit.MM));
                 telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.MM));
+                telemetry.addData("Odo A", drive.odo.getHeading(AngleUnit.DEGREES));
             }
         });
 
@@ -132,7 +135,21 @@ public class MainTeleOp extends CommandOpMode {
                 )
         );
 
+        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileActiveContinuous(
+                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 270.0)
+        );
 
+        Gamepad1.getGamepadButton(GamepadKeys.Button.B).whileActiveContinuous(
+                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 180.0)
+        );
+
+        Gamepad1.getGamepadButton(GamepadKeys.Button.X).whileActiveContinuous(
+                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 0.0)
+        );
+
+        Gamepad1.getGamepadButton(GamepadKeys.Button.Y).whileActiveContinuous(
+                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 90.0)
+        );
 
         /// ==================================================
         //endregion
