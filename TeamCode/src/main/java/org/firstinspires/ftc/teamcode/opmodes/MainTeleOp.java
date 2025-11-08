@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.commands.FaceAllianceGoalCommand;
 import org.firstinspires.ftc.teamcode.commands.FieldDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeSetPowerCommand;
@@ -52,6 +54,15 @@ public class MainTeleOp extends CommandOpMode {
 
         // Schedule any commands that need to be repeated for the entire OpMode.
         schedule(new PeriodicFunctionCommand(this.drive, this.intake, this.shooter, this.vision));
+
+        schedule(new CommandBase() {
+            @Override
+            public void execute() {
+                telemetry.update();
+                telemetry.addData("Odo X", drive.odo.getPosX(DistanceUnit.MM));
+                telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.MM));
+            }
+        });
 
         //region Robot-Centric Driving Code
         /// ==================================================
@@ -121,6 +132,10 @@ public class MainTeleOp extends CommandOpMode {
                 )
         );
 
+        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileActiveOnce(
+                new
+        )
+
         /// ==================================================
         //endregion
 
@@ -140,21 +155,20 @@ public class MainTeleOp extends CommandOpMode {
         /// ==================================================
         //endregion
 
-        BooleanSupplier isRed = () -> isRedAlliance; // your toggle from earlier
-
-        // Hold Right Trigger to aim-assist while freely translating
-        new com.seattlesolvers.solverslib.command.button.Trigger(
-                () -> gamepad1.right_trigger > 0.4
-        ).whileActiveContinuous(
-                new FaceAllianceGoalCommand(
-                        drive, vision,
-                        () -> gamepad1.left_stick_x,      // strafe
-                        () -> -gamepad1.left_stick_y,     // forward (invert if needed)
-                        isRed,
-                        0.01, 0.3, 1.0, 4
-                )
-        );
-
+//        BooleanSupplier isRed = () -> isRedAlliance; // your toggle from earlier
+//
+//        // Hold Right Trigger to aim-assist while freely translating
+//        new com.seattlesolvers.solverslib.command.button.Trigger(
+//                () -> gamepad1.right_trigger > 0.4
+//        ).whileActiveContinuous(
+//                new FaceAllianceGoalCommand(
+//                        drive, vision,
+//                        () -> gamepad1.left_stick_x,      // strafe
+//                        () -> -gamepad1.left_stick_y,     // forward (invert if needed)
+//                        isRed,
+//                        0.0, 0.3, 1.0, 4
+//                )
+//        );
     }
 
     // Might not be necessary, as the OpMode already runs as-is. Should not run more than

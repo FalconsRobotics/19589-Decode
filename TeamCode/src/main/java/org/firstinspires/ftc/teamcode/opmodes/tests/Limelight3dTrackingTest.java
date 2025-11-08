@@ -24,7 +24,6 @@ import java.util.List;
  */
 @TeleOp(name = "Limelight 3d Testing - Teigan", group = "Test")
 public class Limelight3dTrackingTest extends LinearOpMode {
-
     // Stores the 2D pose (x, y, heading)
     Pose2D pose;
     // Stores the latest Limelight result (tag detections, tx, ty, etc.)
@@ -32,9 +31,6 @@ public class Limelight3dTrackingTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        // --- LIMELIGHT INITIALIZATION ---
-
         // Get the Limelight from hardware map (name must match Robot Configuration)
         Limelight3A ll = hardwareMap.get(Limelight3A.class, "limelight");
 

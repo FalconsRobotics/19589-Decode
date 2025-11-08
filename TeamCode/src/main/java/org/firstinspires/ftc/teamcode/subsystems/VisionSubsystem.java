@@ -38,7 +38,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        super.periodic();
         result = ll.getLatestResult();
         ll.updateRobotOrientation(driveInstance.odo.getHeading(AngleUnit.DEGREES));
 
