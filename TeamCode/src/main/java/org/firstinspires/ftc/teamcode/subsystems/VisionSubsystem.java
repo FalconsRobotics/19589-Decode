@@ -24,6 +24,9 @@ public class VisionSubsystem extends SubsystemBase {
     private Pose2D lastLLPose2d = null;
     private long   lastLLPoseMillis = 0L;
 
+    //Motif value
+    int motif;
+
     public VisionSubsystem(HardwareMap map, DrivebaseSubsystem suppliedDrive) {
         this.driveInstance = suppliedDrive;
 
@@ -35,7 +38,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        super.periodic();
         result = ll.getLatestResult();
         ll.updateRobotOrientation(driveInstance.odo.getHeading(AngleUnit.DEGREES));
 
@@ -58,6 +60,34 @@ public class VisionSubsystem extends SubsystemBase {
     // ----------------------------
     // Limelight helpers (for commands/telemetry)
     // ----------------------------
+
+    public double geTx(){
+        return result.getTx();
+    }
+
+    /** returns the motif value*/
+    public int getMotif(){
+        return motif;
+    }
+
+    /** Finds the tag id and sets motif to value 1, 2, or 3 depending on tag. Motif value of 0 means no tag was detected*/
+    public void findMotif(){
+        ll.pipelineSwitch(0);
+        List<LLResultTypes.FiducialResult> fidRes = result.getFiducialResults();
+
+        for(LLResultTypes.FiducialResult fid : fidRes){
+            int id = fid.getFiducialId();
+            if(id == 21){
+                motif = 1;
+            } else if(id == 22){
+                motif = 2;
+            } else if(id == 23){
+                motif = 3;
+            } else {
+                motif = 0;
+            }
+        }
+    }
 
     /** Best-available 2D field pose from MegaTag2 this loop, or last cached. Units: mm & deg. */
     public Pose2D llPose() {

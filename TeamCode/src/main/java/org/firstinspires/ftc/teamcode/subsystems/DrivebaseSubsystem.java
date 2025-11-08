@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.controller.PIDFController;
@@ -12,12 +9,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.constants.DriveConstants;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * The subsystem class for our drivebase. Holds motor objects for each wheel,
@@ -61,8 +53,11 @@ public class DrivebaseSubsystem extends SubsystemBase {
         // using the GoBilda 4-bar odometry pod resolution and forward directions.
         odo = map.get(GoBildaPinpointDriver.class, "odo");
         odo.initialize();
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+
+        odo.setOffsets(80.0, 96.0, DistanceUnit.MM);
+
         odo.recalibrateIMU();
         odo.resetPosAndIMU();
 
@@ -74,7 +69,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
                 DriveConstants.DRIVE_KD,
                 DriveConstants.DRIVE_KF
         );
-        turnPID.setSetPoint(0);
     }
 
     @Override
@@ -160,32 +154,24 @@ public class DrivebaseSubsystem extends SubsystemBase {
     public void driveFieldCentricHeadingLock(double cX, double cY, double lockHeading) {
         // odo.getHeading() retrieves the current heading from the Pinpoint computer.
         // The SolversLib function requires degrees, so that's what we'll use.
-        double headingRad = odo.getHeading(AngleUnit.RADIANS);
+        double currentHeading = odo.getHeading(AngleUnit.RADIANS);
 
-        // Calculate the unit vectors for our field-centric driving.
-        double robotForward = cY * Math.cos(headingRad) + cX * Math.sin(headingRad);
-        double robotStrafe = cY * -Math.sin(headingRad) + cX * Math.cos(headingRad);
+        turnPID.setSetPoint(lockHeading);
+        double turnPower = turnPID.calculate(currentHeading);
 
         // Keep the acceleration between -MAX_ACCEL_CHANGE and +MAX_ACCEL_CHANGE, a variable
         // that is defined in DriveConstants so that it can be easily manipulated.
-        double change = robotForward - this.lastForwardMovement;
+        double change = cY - this.lastForwardMovement;
         if (change > DriveConstants.MAX_ACCEL_CHANGE) {
             change = DriveConstants.MAX_ACCEL_CHANGE;
         } else if (change < -DriveConstants.MAX_ACCEL_CHANGE) {
             change = -DriveConstants.MAX_ACCEL_CHANGE;
         }
 
-        // Add/subtract the limited acceleration from our last forward/background movement.
-        double limitedForward = this.lastForwardMovement + change;
-
-        // Pull our current heading in degrees from the Pinpoint
-        double currentHeading = odo.getHeading(AngleUnit.DEGREES);
-
         // Calculate the error between the desired heading and the current heading, limit
         // it from -180 to 180 degrees, and calculate the turn power required to turn to
         // that heading using our PIDF controller.
-        double error = AngleUnit.normalizeDegrees(lockHeading - currentHeading);
-        double turnPower = turnPID.calculate(-error);
+        double limitedForward = this.lastForwardMovement + change;
 
         // Call the SolversLib field-centric driving function with the calculated turn power
         // and slew rate controller.

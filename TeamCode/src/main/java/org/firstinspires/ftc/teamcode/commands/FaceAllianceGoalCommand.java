@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.commands;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
@@ -11,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 //Command allows you to drive freely in the x and y direction
 //while the robot automatically turns and locks in on the goal
+@Config
 public class FaceAllianceGoalCommand extends CommandBase {
     private final DrivebaseSubsystem drive;
     private final VisionSubsystem vision;
