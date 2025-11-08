@@ -19,6 +19,8 @@ public class CompareOdoMT1MT2 extends LinearOpMode {
         DrivebaseSubsystem drive = new DrivebaseSubsystem(hardwareMap);
         VisionSubsystem vision = new VisionSubsystem(hardwareMap, drive);
 
+        vision.ll.pipelineSwitch(1);
+
         telemetry.addLine("Ready to compare Odo, MT1, and MT2 poses...");
         telemetry.update();
 
