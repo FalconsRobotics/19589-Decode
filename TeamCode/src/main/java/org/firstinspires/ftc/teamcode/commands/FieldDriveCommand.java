@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -30,6 +31,7 @@ public class FieldDriveCommand extends CommandBase {
     @Override
     public void execute() {
         // Call the DrivebaseSubsystem drive function using our supplied movement values.
-        this.drive.driveFieldCentric(strafePower.getAsDouble(), -forwardPower.getAsDouble(), -turnPower.getAsDouble());
+        this.drive.driveFieldCentric(strafePower.getAsDouble(), -forwardPower.getAsDouble(), turnPower.getAsDouble());
     }
+
 }
