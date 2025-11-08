@@ -132,9 +132,7 @@ public class MainTeleOp extends CommandOpMode {
                 )
         );
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileActiveOnce(
-                new
-        )
+
 
         /// ==================================================
         //endregion
