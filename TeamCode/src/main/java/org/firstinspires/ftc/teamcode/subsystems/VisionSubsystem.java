@@ -24,6 +24,9 @@ public class VisionSubsystem extends SubsystemBase {
     private Pose2D lastLLPose2d = null;
     private long   lastLLPoseMillis = 0L;
 
+    //Motif value
+    int motif;
+
     public VisionSubsystem(HardwareMap map, DrivebaseSubsystem suppliedDrive) {
         this.driveInstance = suppliedDrive;
 
@@ -58,6 +61,29 @@ public class VisionSubsystem extends SubsystemBase {
     // ----------------------------
     // Limelight helpers (for commands/telemetry)
     // ----------------------------
+
+    public double geTx(){
+        return result.getTx();
+    }
+
+    public double findMotif(){
+        List<LLResultTypes.FiducialResult> fidRes = result.getFiducialResults();
+
+        for(LLResultTypes.FiducialResult fid : fidRes){
+            int id = fid.getFiducialId();
+            if(id == 21){
+                motif = 1;
+            } else if(id == 2){
+                motif = 2;
+            } else if(id == 3){
+                motif = 3;
+            } else {
+                motif = 0;
+            }
+        }
+        //if it returns 0 it did not see a motif
+        return motif;
+    }
 
     /** Best-available 2D field pose from MegaTag2 this loop, or last cached. Units: mm & deg. */
     public Pose2D llPose() {
