@@ -31,6 +31,6 @@ public class RobotDriveCommand extends CommandBase {
     @Override
     public void execute() {
         // Call the DrivebaseSubsystem drive function using our supplied movement values.
-        this.drive.drive(-strafePower.getAsDouble(), -forwardPower.getAsDouble(), -turnPower.getAsDouble());
+        this.drive.drive(strafePower.getAsDouble(), forwardPower.getAsDouble(), turnPower.getAsDouble());
     }
 }

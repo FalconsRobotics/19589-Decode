@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
@@ -7,7 +8,9 @@ import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.commands.FaceAllianceGoalCommand;
 import org.firstinspires.ftc.teamcode.commands.FieldDriveCommand;
@@ -47,6 +50,8 @@ public class MainTeleOp extends CommandOpMode {
         shooter = new ShooterSubsystem();
         vision = new VisionSubsystem(hardwareMap, this.drive);
 
+        Telemetry dashboard = FtcDashboard.getInstance().getTelemetry();
+
         // Intialize our gamepads by passing in the existing built-in FTC gamepad objects.
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
@@ -64,6 +69,19 @@ public class MainTeleOp extends CommandOpMode {
                 telemetry.addData("Odo X", drive.odo.getPosX(DistanceUnit.MM));
                 telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.MM));
                 telemetry.addData("Odo A", drive.odo.getHeading(AngleUnit.DEGREES));
+                telemetry.addLine();
+
+                dashboard.update();
+                dashboard.addData("LF", drive.frontLeftMotor.get());
+                dashboard.addData("LR", drive.frontRightMotor.get());
+                dashboard.addData("BL", drive.backLeftMotor.get());
+                dashboard.addData("BR", drive.backRightMotor.get());
+
+                dashboard.addData("Current Heading", drive.currentAngle);
+                dashboard.addData("Target Heading", drive.targetAngle);
+                dashboard.addData("Angle Error", drive.angleError);
+
+//                dashboard.addData("");
             }
         });
 
@@ -135,55 +153,21 @@ public class MainTeleOp extends CommandOpMode {
                 )
         );
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileActiveContinuous(
-                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 270.0)
+        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileHeld(
+                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0, -90)
         );
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.B).whileActiveContinuous(
-                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 180.0)
+        Gamepad1.getGamepadButton(GamepadKeys.Button.B).whileHeld(
+                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0, 180)
         );
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.X).whileActiveContinuous(
-                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 0.0)
+        Gamepad1.getGamepadButton(GamepadKeys.Button.X).whileHeld(
+                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0,0)
         );
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.Y).whileActiveContinuous(
-                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, () -> 90.0)
+        Gamepad1.getGamepadButton(GamepadKeys.Button.Y).whileHeld(
+                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0, 90)
         );
-
-        /// ==================================================
-        //endregion
-
-        //region Intake Control
-        /// ==================================================
-
-        // Set the default command for our intake (i.e. when no other commands are using it), we
-        // we want it to drive forward and suck balls in.
-        intake.setDefaultCommand(new IntakeSetPowerCommand(intake, () -> 1.0));
-
-        // If the Gamepad2 right trigger is more than half way down, we want to reverse the intake, by
-        // calling the same command.
-        if (Gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.5) {
-            new IntakeSetPowerCommand(intake, () -> -1.0);
-        }
-
-        /// ==================================================
-        //endregion
-
-//        BooleanSupplier isRed = () -> isRedAlliance; // your toggle from earlier
-//
-//        // Hold Right Trigger to aim-assist while freely translating
-//        new com.seattlesolvers.solverslib.command.button.Trigger(
-//                () -> gamepad1.right_trigger > 0.4
-//        ).whileActiveContinuous(
-//                new FaceAllianceGoalCommand(
-//                        drive, vision,
-//                        () -> gamepad1.left_stick_x,      // strafe
-//                        () -> -gamepad1.left_stick_y,     // forward (invert if needed)
-//                        isRed,
-//                        0.0, 0.3, 1.0, 4
-//                )
-//        );
     }
 
     // Might not be necessary, as the OpMode already runs as-is. Should not run more than

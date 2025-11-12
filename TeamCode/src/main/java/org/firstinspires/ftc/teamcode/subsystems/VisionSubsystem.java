@@ -190,15 +190,15 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /** Resets Pinpoint pose & IMU (re-zeros heading & odometry). */
-    public void resetHeading() {
-        driveInstance.odo.resetPosAndIMU();
-        driveInstance.turnPID.reset();
-        driveInstance.turnPID.setSetPoint(0);
-    }
+//    public void resetHeading() {
+//        driveInstance.odo.resetPosAndIMU();
+//        turnPID.reset();
+//        turnPID.setSetPoint(0);
+//    }
 
     /** Optional: snap helper for button-driven heading locks (pairs with driveFieldCentricHeadingLock). */
     public void snapHeadingDegrees(double headingDeg) {
-        driveInstance.turnPID.setSetPoint(0); // we pass error directly in driveFieldCentricHeadingLock
+//        driveInstance.turnPID.setSetPoint(0); // we pass error directly in driveFieldCentricHeadingLock
         // no persistent lock here; the caller supplies lockHeading to the drive method below
     }
 }
