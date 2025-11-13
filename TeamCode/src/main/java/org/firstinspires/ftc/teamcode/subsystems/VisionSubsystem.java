@@ -38,19 +38,24 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        driveInstance.odo.update();
         result = ll.getLatestResult();
-        ll.updateRobotOrientation(driveInstance.odo.getHeading(AngleUnit.DEGREES));
+
+        double yawDeg = driveInstance.odo.getHeading(AngleUnit.DEGREES);
+        // If your odo increases CW, invert it:
+        yawDeg = -yawDeg;
+        ll.updateRobotOrientation(yawDeg);
 
         // Cache most recent valid MT2 2D pose
         if (result != null && result.isValid()) {
             Pose3D mt2 = result.getBotpose_MT2();
             if (mt2 != null) {
                 lastLLPose2d = new Pose2D(
-                        DistanceUnit.MM,
+                        DistanceUnit.METER,
                         mt2.getPosition().x,
                         mt2.getPosition().y,
                         AngleUnit.DEGREES,
-                        driveInstance.odo.getHeading(AngleUnit.DEGREES) // keep heading from odometry
+                        yawDeg
                 );
                 lastLLPoseMillis = System.currentTimeMillis();
             }
@@ -61,7 +66,7 @@ public class VisionSubsystem extends SubsystemBase {
     // Limelight helpers (for commands/telemetry)
     // ----------------------------
 
-    public double geTx(){
+    public double geTx (){
         return result.getTx();
     }
 
@@ -75,7 +80,7 @@ public class VisionSubsystem extends SubsystemBase {
         ll.pipelineSwitch(0);
         List<LLResultTypes.FiducialResult> fidRes = result.getFiducialResults();
 
-        for(LLResultTypes.FiducialResult fid : fidRes){
+        for (LLResultTypes.FiducialResult fid : fidRes){
             int id = fid.getFiducialId();
             if(id == 21){
                 motif = 1;
@@ -89,13 +94,31 @@ public class VisionSubsystem extends SubsystemBase {
         }
     }
 
+    public Pose2D llPoseMT1(){
+        //ll.pipelineSwitch(1);
+        if (result != null && result.isValid()) {
+            Pose3D p3 = result.getBotpose();
+            if (p3 != null) {
+                return new Pose2D(
+                        DistanceUnit.MM,
+                        p3.getPosition().x,
+                        p3.getPosition().y,
+                        AngleUnit.DEGREES,
+                        p3.getOrientation().getYaw(AngleUnit.DEGREES)
+                );
+            }
+        }
+        return lastLLPose2d;
+    }
+
     /** Best-available 2D field pose from MegaTag2 this loop, or last cached. Units: mm & deg. */
     public Pose2D llPose() {
+        //ll.pipelineSwitch(1);
         if (result != null && result.isValid()) {
             Pose3D p3 = result.getBotpose_MT2();
             if (p3 != null) {
                 return new Pose2D(
-                        DistanceUnit.MM,
+                        DistanceUnit.METER,
                         p3.getPosition().x,
                         p3.getPosition().y,
                         AngleUnit.DEGREES,
@@ -167,15 +190,15 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     /** Resets Pinpoint pose & IMU (re-zeros heading & odometry). */
-    public void resetHeading() {
-        driveInstance.odo.resetPosAndIMU();
-        driveInstance.turnPID.reset();
-        driveInstance.turnPID.setSetPoint(0);
-    }
+//    public void resetHeading() {
+//        driveInstance.odo.resetPosAndIMU();
+//        turnPID.reset();
+//        turnPID.setSetPoint(0);
+//    }
 
     /** Optional: snap helper for button-driven heading locks (pairs with driveFieldCentricHeadingLock). */
     public void snapHeadingDegrees(double headingDeg) {
-        driveInstance.turnPID.setSetPoint(0); // we pass error directly in driveFieldCentricHeadingLock
+//        driveInstance.turnPID.setSetPoint(0); // we pass error directly in driveFieldCentricHeadingLock
         // no persistent lock here; the caller supplies lockHeading to the drive method below
     }
 }
