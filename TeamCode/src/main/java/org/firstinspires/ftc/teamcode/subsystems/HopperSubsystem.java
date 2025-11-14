@@ -4,6 +4,7 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
@@ -21,6 +22,11 @@ public class HopperSubsystem extends SubsystemBase {
     /// Object that references the Axon Servo's encoder wire
     private final RevColorSensorV3 topSensor, bottomSensor;
 
+    /// Object that references the magnet switch on rotor
+    private final DigitalChannel magSwitch;
+
+    public boolean isHomed, magnetSeenDuringHoming;
+
 
     /**
      * Initialize the HopperSubsystem and initializes device settings
@@ -28,13 +34,20 @@ public class HopperSubsystem extends SubsystemBase {
      */
     public HopperSubsystem(HardwareMap map) {
         servo = map.get(CRServo.class, "CarouselServo");
+        servo.setDirection(CRServo.Direction.REVERSE);
+
         encoder = map.get(DcMotor.class, "MotorEncoder");
+        encoder.setDirection(DcMotor.Direction.FORWARD);
+        encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        magSwitch = map.get(DigitalChannel.class, "MagnetSwitch");
+        magSwitch.setMode(DigitalChannel.Mode.INPUT);
 
         topSensor = map.get(RevColorSensorV3.class, "TopSensor");
         bottomSensor = map.get(RevColorSensorV3.class, "BottomSensor");
 
-        servo.setDirection(CRServo.Direction.REVERSE);
-        encoder.setDirection(DcMotor.Direction.FORWARD);
+        isHomed = false;
+        magnetSeenDuringHoming = false;
     }
 
     ///@return The position of the servo using the Through Bore Encoder
@@ -90,7 +103,17 @@ public class HopperSubsystem extends SubsystemBase {
         return bottomSensor.getNormalizedColors();
     }
 
-    public void method() {
+    /// @return Raw state of the magnet switch
+    public boolean magnetStateRaw() {
+        return magSwitch.getState();
+    }
 
+    /// @return If the magnet is making contact with switch
+    public boolean magnetIsActive() {
+        return !magnetStateRaw();
+    }
+
+    public void zeroEncoder() {
+        encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 }
