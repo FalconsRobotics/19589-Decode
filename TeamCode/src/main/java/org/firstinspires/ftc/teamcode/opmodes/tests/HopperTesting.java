@@ -47,7 +47,8 @@ public class HopperTesting extends OpMode {
 
     @Override
     public void loop() {
-
+        telemetry.addData("Raw Encoder", hopper.getServoPosition());
+        telemetry.update();
     }
 
 }
