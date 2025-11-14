@@ -1,12 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.constants.Color;
 
 public class HopperSubsystem extends SubsystemBase {
     /// Object that references the center servo on the hopper.
@@ -16,7 +22,8 @@ public class HopperSubsystem extends SubsystemBase {
     private final DcMotor encoder;
 
     /// Object that references the Axon Servo's encoder wire
-    //private final AnalogInput axonEncoder;
+    private final RevColorSensorV3 topSensor, bottomSensor;
+
 
     /**
      * Initialize the HopperSubsystem and initializes device settings
@@ -24,17 +31,14 @@ public class HopperSubsystem extends SubsystemBase {
      */
     public HopperSubsystem(HardwareMap map) {
         servo = map.get(CRServo.class, "CarouselServo");
-        encoder = map.get(DcMotor.class, "motorEncoder");
-        //axonEncoder = map.get(AnalogInput.class, "axonEncoder");
+        encoder = map.get(DcMotor.class, "MotorEncoder");
 
-        servo.setDirection(CRServo.Direction.FORWARD);
+        topSensor = map.get(RevColorSensorV3.class, "TopSensor");
+        bottomSensor = map.get(RevColorSensorV3.class, "BottomSensor");
+
+        servo.setDirection(CRServo.Direction.REVERSE);
         encoder.setDirection(DcMotor.Direction.FORWARD);
     }
-
-    /// @return The position of the Axon Servo ranging from 0.0-3.3v
-    /*public double getAxonEncoder() {
-        return axonEncoder.getVoltage();
-    }*/
 
     ///@return The position of the servo using the Through Bore Encoder
     public int getServoPosition() {
@@ -66,17 +70,30 @@ public class HopperSubsystem extends SubsystemBase {
         double prop_output = error * P_GAIN;
         double final_power = Math.max(-MAX, Math.min(MAX, prop_output));
 
-        setServoPower(final_power);
+        this.setServoPower(final_power);
     }
 
-    /**
-     * @return The angle of the axon servo
-     * @param unit Unit of return angle
-     */
-    /*
-    public double getAxonAngle(AngleUnit unit) {
-        double degrees = getAxonEncoder() * (360 / axonEncoder.getMaxVoltage());
+    /// @return The distance from the Top Sensor
+    public double getTopDistance() {
+        return topSensor.getDistance(DistanceUnit.MM);
+    }
 
-        return (unit == AngleUnit.DEGREES ? degrees : Math.toRadians(degrees));
-    }*/
+    /// @return The distance from the Bottom Sensor
+    public double getBottomDistance() {
+        return bottomSensor.getDistance(DistanceUnit.MM);
+    }
+
+    /// @return The color returned from the Top Sensor
+    public NormalizedRGBA getTopColor() {
+        return topSensor.getNormalizedColors();
+    }
+
+    /// @return The color returned from the Bottom Sensor
+    public NormalizedRGBA getBottomColor() {
+        return bottomSensor.getNormalizedColors();
+    }
+
+    public void method() {
+
+    }
 }

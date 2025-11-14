@@ -15,11 +15,11 @@ public class LedSubsystem extends SubsystemBase {
      * @param map HardwareMap object from OpMode
      */
     public LedSubsystem(HardwareMap map) {
-        LED[0] = map.get(Servo.class, "led0");
-        LED[1] = map.get(Servo.class, "led1");
-        LED[2] = map.get(Servo.class, "led2");
+        LED[0] = map.get(Servo.class, "Led0");
+        LED[1] = map.get(Servo.class, "Led1");
+        LED[2] = map.get(Servo.class, "Led2");
 
-        strip = map.get(RevBlinkinLedDriver.class, "ledStrip");
+        strip = map.get(RevBlinkinLedDriver.class, "LedStrip");
     }
 
     /**
@@ -38,9 +38,21 @@ public class LedSubsystem extends SubsystemBase {
         }
     }
 
-    public void setColor(Object index, double color) {
-        if (index.getClass() == int.class) {
-
+    /// @return The color of a specific LED
+    public double getColor(int index) {
+        if (index >= 0 && index <= 2) {
+            return LED[index].getPosition();
         }
+        else {
+            return 67.41;
+        }
+    }
+
+    /**
+     * Sets the led strip's pattern
+     * @param pattern Color Pattern to pass into the Strip
+     */
+    public void setColor(RevBlinkinLedDriver.BlinkinPattern pattern) {
+        strip.setPattern(pattern);
     }
 }
