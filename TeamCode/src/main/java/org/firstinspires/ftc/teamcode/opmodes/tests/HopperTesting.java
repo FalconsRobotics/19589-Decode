@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.tests;
 
+import static org.firstinspires.ftc.teamcode.constants.HopperConstants.TICKS_PER_STEP;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -47,6 +49,18 @@ public class HopperTesting extends OpMode {
 
     @Override
     public void loop() {
+        gp.readButtons();
+
+        if (gp.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+            hopper.toPosition(hopper.getServoPosition() + (int) HopperConstants.TICKS_PER_STEP);
+        }
+        if (gp.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+            hopper.toPosition(hopper.getServoPosition() - (int) HopperConstants.TICKS_PER_STEP);
+        }
+
+
+
+
         telemetry.addData("Raw Encoder", hopper.getServoPosition());
         telemetry.update();
     }
