@@ -100,7 +100,7 @@ public class MainTeleOp extends CommandOpMode {
         // robot-centric mode. We pass in our drivebase so that the RobotDriveCommand knows
         // what drivebase to use, and we pass in DoubleSuppliers for direct access to our
         // Gamepad joystick values.
-        drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX));
+//        drive.setDefaultCommand(new RobotDriveCommand(drive, Gamepad1::getLeftY, Gamepad1::getLeftX, Gamepad1::getRightX));
 
         /// ==================================================
         //endregion
@@ -167,6 +167,10 @@ public class MainTeleOp extends CommandOpMode {
 
         Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileHeld(
                 new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, drive.normalizeTo180Deg(Math.toDegrees(Math.atan2(72 - drive.odo.getPosX(DistanceUnit.INCH), 72 - drive.odo.getPosY(DistanceUnit.INCH)))))
+        );
+
+        new Trigger(() -> Gamepad1.getRightX() >= 0.25).whileActiveContinuous(
+                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, drive.normalizeTo180Deg(Math.toDegrees(Math.atan2(Gamepad1.getRightX(), -Gamepad1.getRightY()))))
         );
 
         //endregion
