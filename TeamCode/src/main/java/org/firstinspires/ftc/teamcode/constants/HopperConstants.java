@@ -10,5 +10,5 @@ public class HopperConstants {
     public static double MOVE_KP = 0.002;
     public static double MOVE_MAX = 0.5;
     public static int TOLERANCE_TICKS = 20;
-    public static double MOVE_MIN = 0.15;
+    public static double MOVE_MIN = 0.55;
 }

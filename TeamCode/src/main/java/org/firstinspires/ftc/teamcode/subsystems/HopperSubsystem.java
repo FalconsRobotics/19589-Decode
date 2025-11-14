@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.constants.HopperConstants;
 
 
 public class HopperSubsystem extends SubsystemBase {
@@ -74,13 +75,17 @@ public class HopperSubsystem extends SubsystemBase {
      */
     public void toPosition(int target) {
         int error = target - getServoPosition();
-        double MAX = 0.1;
-        double P_GAIN = 0.005;
+        double proportional = (double) target * HopperConstants.MOVE_KP;
 
-        double prop_output = error * P_GAIN;
-        double final_power = Math.max(-MAX, Math.min(MAX, prop_output));
-
-        this.setServoPower(final_power);
+        if (Math.signum(error) == 1) {
+            setServoPower(Math.min(HopperConstants.MOVE_MIN, proportional));
+        }
+        else if (Math.signum(error) == -1) {
+            setServoPower(Math.max(-HopperConstants.MOVE_MIN, proportional));
+        }
+        else {
+            setServoPower(0);
+        }
     }
 
     /// @return The distance from the Top Sensor
