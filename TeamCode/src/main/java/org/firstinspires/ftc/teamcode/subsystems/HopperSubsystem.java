@@ -1,18 +1,15 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.constants.Color;
+
 
 public class HopperSubsystem extends SubsystemBase {
     /// Object that references the center servo on the hopper.

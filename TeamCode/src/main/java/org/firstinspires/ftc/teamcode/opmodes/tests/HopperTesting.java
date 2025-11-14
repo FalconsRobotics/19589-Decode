@@ -66,6 +66,42 @@ public class HopperTesting extends LinearOpMode {
             );
             telemetry.addData("Top Distance", hopper.getTopDistance());
             telemetry.addData("Bottom Distance", hopper.getBottomDistance());
+
+            telemetry.addLine();
+            telemetry.addLine();
+            telemetry.addLine();
+            telemetry.addLine();
+            telemetry.addLine();
+
+            telemetry.addData("line_01", "                             %                                 ");
+            telemetry.addData("line_02", "          %  %%  %                             ");
+            telemetry.addData("line_03", "          %%%%% %%%%%%%%%%%%%                  ");
+            telemetry.addData("line_04", "           %%%%%%%%#********#%%                ");
+            telemetry.addData("line_05", "           %%%%%%%%#========--*%%              ");
+            telemetry.addData("line_06", "           %%%%%%%%%%%%%%%%%%#=-#%             ");
+            telemetry.addData("line_07", "           %%%%%%%%%%%%%%%%%%%%#-%             ");
+            telemetry.addData("line_08", "            %%%%%%%%%%%%%%%%%%%%*+%            ");
+            telemetry.addData("line_09", "             %%%%%%%%%%%  %%%%%%%+%            ");
+            telemetry.addData("line_10", "              %%%%%%%%%%% %%%%%%%*%            ");
+            telemetry.addData("line_11", "                %%%%%%%%%%%%%%%%%*%            ");
+            telemetry.addData("line_12", "               %%%%%%%%%%%%%  %%%#%            ");
+            telemetry.addData("line_13", "               %%%%%%%%%%%%  %%%%%%            ");
+            telemetry.addData("line_14", "               %%%%%%%%%%%%   %%%%%            ");
+            telemetry.addData("line_15", "               %%%%%%%%%%%%%%%%%%%             ");
+            telemetry.addData("line_16", "               %%%%%%%%%%%%%%%%%%              ");
+            telemetry.addData("line_17", "               %%%%%%%%% %%%%%%%               ");
+            telemetry.addData("line_18", "               %%%%%%% % %%%%%%                ");
+            telemetry.addData("line_19", "               %%%%%%%   %%%%%%%               ");
+            telemetry.addData("line_20", "               %%%%%%%   %%%%%%%%              ");
+            telemetry.addData("line_21", "               %%%%%%%   %%%%%%%%              ");
+            telemetry.addData("line_22", "               %%%%%%%    %%%%%%%%             ");
+            telemetry.addData("line_23", "               %%%%%%%     %%%%%%%%            ");
+            telemetry.addData("line_24", "               %%%%%%%     %%%%%%%%%           ");
+            telemetry.addData("line_25", "               %%%%%%%      %%%%%%%%           ");
+            telemetry.addData("line_26", " "); // Blank line for spacing
+
+            // Important: You must call telemetry.update() to display the new data
+            telemetry.update();
             telemetry.update();
         }
     }
