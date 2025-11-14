@@ -21,7 +21,7 @@ public class HopperSubsystem extends SubsystemBase {
     private final DcMotor encoder;
 
     /// Object that references the Axon Servo's encoder wire
-    private final RevColorSensorV3 topSensor, bottomSensor;
+    private final RevColorSensorV3 /* topSensor, */ bottomSensor;
 
     /// Object that references the magnet switch on rotor
     private final DigitalChannel magSwitch;
@@ -44,7 +44,7 @@ public class HopperSubsystem extends SubsystemBase {
         magSwitch = map.get(DigitalChannel.class, "MagnetSwitch");
         magSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        topSensor = map.get(RevColorSensorV3.class, "TopSensor");
+//        topSensor = map.get(RevColorSensorV3.class, "TopSensor");
         bottomSensor = map.get(RevColorSensorV3.class, "BottomSensor");
 
         isHomed = false;
@@ -89,9 +89,9 @@ public class HopperSubsystem extends SubsystemBase {
     }
 
     /// @return The distance from the Top Sensor
-    public double getTopDistance() {
-        return topSensor.getDistance(DistanceUnit.MM);
-    }
+//    public double getTopDistance() {
+//        return topSensor.getDistance(DistanceUnit.MM);
+//    }
 
     /// @return The distance from the Bottom Sensor
     public double getBottomDistance() {
@@ -99,9 +99,9 @@ public class HopperSubsystem extends SubsystemBase {
     }
 
     /// @return The color returned from the Top Sensor
-    public NormalizedRGBA getTopColor() {
-        return topSensor.getNormalizedColors();
-    }
+//    public NormalizedRGBA getTopColor() {
+//        return topSensor.getNormalizedColors();
+//    }
 
     /// @return The color returned from the Bottom Sensor
     public NormalizedRGBA getBottomColor() {

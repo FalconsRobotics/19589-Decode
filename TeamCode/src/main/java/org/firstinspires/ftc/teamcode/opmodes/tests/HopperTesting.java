@@ -17,12 +17,14 @@ import java.math.BigInteger;
 @TeleOp(name = "Hopper Testing", group = "Test") @Config
 public class HopperTesting extends OpMode {
 
-    public HopperSubsystem hopper = new HopperSubsystem(hardwareMap);
-    public GamepadEx gp = new GamepadEx(gamepad1);
+    public HopperSubsystem hopper;
+    public GamepadEx gp;
+
 
     @Override
     public void init() {
-
+        hopper = new HopperSubsystem(hardwareMap);
+        GamepadEx gp = new GamepadEx(gamepad1);
     }
 
     @Override
