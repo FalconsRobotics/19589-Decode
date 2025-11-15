@@ -36,6 +36,8 @@ public class ShooterTester extends CommandOpMode {
 
                 dashboard.addData("Shooter Speed", shooter.getVelocity());
 
+                dashboard. addData("Motor Power: ", shooter.getMotorPower());
+
                 dashboard.update();
 
             }
