@@ -11,4 +11,5 @@ public class ShooterConstants {
     public static double VELO_KI = 0.0;
     public static double VELO_KD = 0.0;
     public static double VELO_KF = 0.0;
+    public static double SPEED = 4500;
 }
