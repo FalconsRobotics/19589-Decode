@@ -15,6 +15,8 @@ public class ShooterSubsystem extends SubsystemBase {
     // Object used to store the motor reference.
     DcMotorEx shooterMotor;
 
+    private double targetSpeed = 0.0;
+
     /**
      * Initialize the ShooterSubsystem.
      * @param map Uses the HardwareMap from your Auto/TeleOp to initialize all the hardware.
@@ -40,7 +42,13 @@ public class ShooterSubsystem extends SubsystemBase {
      * @param speed The motor, in revolutions per minute (rpm), that the motor should rotate at.
      */
     public void setVelocity(double speed) {
+        this.targetSpeed = speed;
+
         shooterMotor.setVelocity(speed * 60 / ShooterConstants.MOTOR_RESOLUTION);
+    }
+
+    public double getError(){
+        return shooterMotor.getVelocity() - this.targetSpeed;
     }
 
     /**

@@ -6,6 +6,9 @@ import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * Command used to drive the robot robot-centrically.
+ */
 public class RobotDriveCommand extends CommandBase {
     // An object used to reference our existing Drivebase, pulled from the constructor,
     // which gets the subsystem from our OpMode.
@@ -16,6 +19,13 @@ public class RobotDriveCommand extends CommandBase {
     private final DoubleSupplier strafePower;
     private final DoubleSupplier turnPower;
 
+    /**
+     * Initializes the RobotDriveCommand.
+     * @param suppliedDrive Uses the drivebase from your running OpMode.
+     * @param suppliedStrafe Reference to the sideways power you want the robot to move.
+     * @param suppliedForward Reference to the forward power you want the robot to move.
+     * @param suppliedTurn Reference to the turn power you want the robot to move.
+     */
     public RobotDriveCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedForward, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedTurn) {
         // Set the internal members to our passed-in values, so that this command uses the inputs
         // and subsystems from our OpMode.
