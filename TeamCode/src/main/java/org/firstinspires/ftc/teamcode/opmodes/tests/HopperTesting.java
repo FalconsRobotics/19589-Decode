@@ -1,18 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes.tests;
 
-import static org.firstinspires.ftc.teamcode.constants.HopperConstants.TICKS_PER_STEP;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.constants.HopperConstants;
 import org.firstinspires.ftc.teamcode.subsystems.HopperSubsystem;
-
-import java.math.BigInteger;
 
 @TeleOp(name = "Hopper Testing", group = "Test") @Config
 public class HopperTesting extends OpMode {
@@ -54,16 +49,16 @@ public class HopperTesting extends OpMode {
         gp.readButtons();
 
         if (gp.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-            hopper.toPosition(hopper.getServoPosition() + (int) HopperConstants.TICKS_PER_STEP);
+            hopper.toPositionRaw(hopper.getEncoderPosition() + (int) HopperConstants.TICKS_PER_STEP);
         }
         if (gp.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-            hopper.toPosition(hopper.getServoPosition() - (int) HopperConstants.TICKS_PER_STEP);
+            hopper.toPositionRaw(hopper.getEncoderPosition() - (int) HopperConstants.TICKS_PER_STEP);
         }
 
 
 
 
-        telemetry.addData("Raw Encoder", hopper.getServoPosition());
+        telemetry.addData("Raw Encoder", hopper.getEncoderPosition());
         telemetry.update();
     }
 
