@@ -18,21 +18,21 @@ public class SensorTesting extends LinearOpMode {
 
         int cRed = 0; int cGreen = 0; int cBlue = 0;
 
-        int aRed = 0; int aGreen = 0; int aBlue = 0;
+        int aRed; int aGreen; int aBlue;
 
         int lowRed = 0; int lowGreen = 0; int lowBlue = 0;
         int highRed = 0; int highGreen = 0; int highBlue = 0;
 
 
         while (opModeInInit()) {
-
+            hopper.runToMagnetZero();
         }
 
         while (opModeIsActive()) {
 
-            int red = (int) hopper.getBottomColor().red;
-            int green = (int) hopper.getBottomColor().green;
-            int blue = (int) hopper.getBottomColor().blue;
+            int red = hopper.getBottomColor().red;
+            int green = hopper.getBottomColor().green;
+            int blue = hopper.getBottomColor().blue;
 
             if (cycleCounter == 0) {
                 lowRed = red; highRed = red;
@@ -53,25 +53,27 @@ public class SensorTesting extends LinearOpMode {
             if (red < lowRed) {lowRed = red;} if (green < lowGreen) {lowGreen = green;} if (blue < lowBlue) {lowBlue = blue;}
             if (red > highRed) {highRed = red;} if (green > highGreen) {highGreen = green;} if (blue > highBlue) {highBlue = blue;}
 
+            telemetry.setMsTransmissionInterval(200);
+
             telemetry.addData("Sensor Distance", hopper.getBottomDistance());
+            telemetry.addLine("----------------------------------------");
+            telemetry.addData("Counter", cycleCounter);
+            telemetry.addLine("----------------------------------------");
+            telemetry.addData("Current Red", red);
+            telemetry.addData("Current Red", green);
+            telemetry.addData("Current Red", blue);
             telemetry.addLine("----------------------------------------");
             telemetry.addData("Avg Red", aRed);
             telemetry.addData("Avg Green", aGreen);
             telemetry.addData("Avg Blue", aBlue);
             telemetry.addLine("----------------------------------------");
-            telemetry.addData("Red Thresholds", "Low Red: %.2f | High Red: %.2f", lowRed, highRed);
-            telemetry.addData("Green Thresholds", "Low Red: %.2f | High Red: %.2f", lowGreen, highGreen);
-            telemetry.addData("Blue Thresholds", "Low Red: %.2f | High Red: %.2f", lowBlue, highBlue);
-            telemetry.update();
-            /* ------------------------------------------------------------------ */
-            dashboard.addData("Avg Red", aRed);
-            dashboard.addData("Avg Green", aGreen);
-            dashboard.addData("Avg Blue", aBlue);
-            dashboard.addLine("----------------------------------------");
-            dashboard.addData("Red Thresholds", "Low Red: %.2f | High Red: %.2f", lowRed, highRed);
-            dashboard.addData("Green Thresholds", "Low Red: %.2f | High Red: %.2f", lowGreen, highGreen);
-            dashboard.addData("Blue Thresholds", "Low Red: %.2f | High Red: %.2f", lowBlue, highBlue);
-            dashboard.update();
+            telemetry.addData("Red Thresholds", "Low Red: %d | High Red: %d", lowRed, highRed);
+            telemetry.addData("Green Thresholds", "Low Red: %d | High Red: %d", lowGreen, highGreen);
+            telemetry.addData("Blue Thresholds", "Low Red: %d | High Red: %d", lowBlue, highBlue);
+
+            if (cycleCounter <= 1000) {
+                telemetry.update();
+            }
         }
     }
 }

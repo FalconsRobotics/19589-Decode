@@ -35,6 +35,18 @@ public class HopperSubsystem extends SubsystemBase {
     ///
     public int targetPosition;
 
+    public static class RGB {
+        public int red;
+        public int green;
+        public int blue;
+
+        public RGB(int r, int g, int b) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+        }
+    }
+
 
     /**
      * Initialize the HopperSubsystem and initializes device settings
@@ -56,7 +68,7 @@ public class HopperSubsystem extends SubsystemBase {
         isHomed = false;
         magnetSeenDuringHoming = false;
 
-        currentPosition = null;
+        currentPosition = 0;
         targetPosition = 0;
     }
 
@@ -184,8 +196,8 @@ public class HopperSubsystem extends SubsystemBase {
 //    }
 
     /// @return The color returned from the Bottom Sensor
-    public NormalizedRGBA getBottomColor() {
-        return bottomSensor.getNormalizedColors();
+    public RGB getBottomColor() {
+        return new RGB(bottomSensor.red(), bottomSensor.green(), bottomSensor.blue());
     }
 
     /// @return Raw state of the magnet switch
