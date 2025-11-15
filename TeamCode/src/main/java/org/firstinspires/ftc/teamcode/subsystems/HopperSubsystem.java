@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.constants.HopperConstants;
 
 
@@ -34,18 +35,6 @@ public class HopperSubsystem extends SubsystemBase {
 
     ///
     public int targetPosition;
-
-    public static class RGB {
-        public int red;
-        public int green;
-        public int blue;
-
-        public RGB(int r, int g, int b) {
-            this.red = r;
-            this.green = g;
-            this.blue = b;
-        }
-    }
 
 
     /**
@@ -196,8 +185,8 @@ public class HopperSubsystem extends SubsystemBase {
 //    }
 
     /// @return The color returned from the Bottom Sensor
-    public RGB getBottomColor() {
-        return new RGB(bottomSensor.red(), bottomSensor.green(), bottomSensor.blue());
+    public ColorConstants.RGB getBottomColor() {
+        return new ColorConstants.RGB(bottomSensor.red(), bottomSensor.green(), bottomSensor.blue());
     }
 
     /// @return Raw state of the magnet switch

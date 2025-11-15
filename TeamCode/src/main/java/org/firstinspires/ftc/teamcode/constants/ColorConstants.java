@@ -2,7 +2,23 @@ package org.firstinspires.ftc.teamcode.constants;
 
 import com.acmerobotics.dashboard.config.Config;
 
-public class Color {
+public class ColorConstants {
+
+    public static enum Ball {
+        PURPLE, GREEN, NULL
+    }
+    public static class RGB {
+        public int red;
+        public int green;
+        public int blue;
+
+        public RGB(int r, int g, int b) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+        }
+    }
+
     /// Spectrum: 0.277 - 0.722 ( > 0.722 is White)
     public static double RED = 0.28;
     public static double ORANGE = 0.333;
@@ -148,22 +164,73 @@ public class Color {
     }
 
     @Config
-    public static class P {
-        public static int RMIN = 60;//70
-        public static int RMAX = 130;//102
-        public static int GMIN = 70;//100
-        public static int GMAX = 180;//133
-        public static int BMIN = 80;//105
-        public static int BMAX = 200;//153
+    public static class PurpleBall {
+        public static int RED_AVG = 75;
+        public static int GREEN_AVG = 114;
+        public static int BLUE_AVG = 109;
+
+        public static int RED_LOW = 62;
+        public static int RED_HIGH = 89;
+        public static int GREEN_LOW = 94;
+        public static int GREEN_HIGH = 132;
+        public static int BLUE_LOW = 83;
+        public static int BLUE_HIGH = 139;
     }
     @Config
-    public static class G {
-        public static int RMIN = 32;//47
-        public static int RMAX = 75;//63
-        public static int GMIN = 100;//123
-        public static int GMAX = 240;//183
-        public static int BMIN = 78;//88
-        public static int BMAX = 160;//140
+    public static class GreenBall {
+        public static int RED_AVG = 56;
+        public static int GREEN_AVG = 161;
+        public static int BLUE_AVG = 114;
+
+        public static int RED_LOW = 43;
+        public static int RED_HIGH = 67;
+        public static int GREEN_LOW = 107;
+        public static int GREEN_HIGH = 214;
+        public static int BLUE_LOW = 75;
+        public static int BLUE_HIGH = 151;
+    }
+
+    /**
+     * @param input input RGB from color sensor
+     * @return If green ball is being detected
+     */
+    public static boolean detectingGreenBall(RGB input) {
+        if (
+                input.red >= GreenBall.RED_LOW && input.red <= GreenBall.RED_HIGH &&
+                input.green >= GreenBall.GREEN_LOW && input.green <= GreenBall.GREEN_HIGH &&
+                input.blue >= GreenBall.BLUE_LOW && input.blue <= GreenBall.BLUE_HIGH
+        ) {
+            return true;
+        } else return false;
+    }
+
+    /**
+     * @param input input RGB from color sensor
+     * @return If purple ball is being detected
+     */
+    public static boolean detectingPurpleBall(RGB input) {
+        if (
+                input.red >= GreenBall.RED_LOW && input.red <= GreenBall.RED_HIGH &&
+                input.green >= GreenBall.GREEN_LOW && input.green <= GreenBall.GREEN_HIGH &&
+                input.blue >= GreenBall.BLUE_LOW && input.blue <= GreenBall.BLUE_HIGH
+        ) {
+            return true;
+        } else return false;
+    }
+
+    /**
+     * @param input input RGB from color sensor
+     * @return Double of ball color detected (BALL_GREEN or BALL_PURPLE) 67.41 if none
+     */
+    public static Ball detetctedColor(RGB input) {
+        if (detectingGreenBall(input)) {
+            return Ball.GREEN;
+        }
+        else if (detectingPurpleBall(input)) {
+            return Ball.PURPLE;
+        }
+        else return Ball.NULL;
+
     }
 
 }

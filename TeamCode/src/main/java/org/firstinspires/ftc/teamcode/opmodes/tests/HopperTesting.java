@@ -1,65 +1,59 @@
 package org.firstinspires.ftc.teamcode.opmodes.tests;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 
+import org.firstinspires.ftc.teamcode.constants.ColorConstants;
 import org.firstinspires.ftc.teamcode.constants.HopperConstants;
 import org.firstinspires.ftc.teamcode.subsystems.HopperSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 
 @TeleOp(name = "Hopper Testing", group = "Test") @Config
-public class HopperTesting extends OpMode {
+public class HopperTesting extends LinearOpMode {
 
     public HopperSubsystem hopper;
+    public IntakeSubsystem intake;
+    public ToggleButtonReader intakeOn;
     public GamepadEx gp;
 
+    public void runOpMode() {
 
-    @Override
-    public void init() {
         hopper = new HopperSubsystem(hardwareMap);
-        GamepadEx gp = new GamepadEx(gamepad1);
-    }
+        intake = new IntakeSubsystem(hardwareMap);
+        gp = new GamepadEx(gamepad1);
+        intakeOn = new ToggleButtonReader(gp, GamepadKeys.Button.A);
 
-    @Override
-    public void init_loop() {
-        if (!hopper.isHomed) {
-            if (!hopper.magnetIsActive()) {
-                hopper.setServoPower(HopperConstants.HOMING_POWER);
+
+
+        while (opModeInInit()) {
+            hopper.runToMagnetZero();
+        }
+
+        while (opModeIsActive()) {
+            gp.readButtons();
+
+            ColorConstants.Ball ballColor = ColorConstants.detetctedColor(hopper.getBottomColor());
+
+            if (gp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.1) {
+                intake.setIntakePower(1.0);
             }
-            else {
-                hopper.setServoPower(0.0);
-                hopper.isHomed = true;
+            else intake.setIntakePower(0.0);
+
+            if (gp.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                hopper.intakeOneTick();
             }
+            if (gp.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                hopper.extakeOneTick();
+            }
+
+            telemetry.addData("Detected Color", ballColor);
+            telemetry.update();
         }
-        else {
-            hopper.setServoPower(0.0);
-            hopper.zeroEncoder();
-        }
-    }
-
-    @Override
-    public void start() {
-        hopper.setServoPower(0.0);
-    }
-
-    @Override
-    public void loop() {
-        gp.readButtons();
-
-        if (gp.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-            hopper.toPositionRaw(hopper.getEncoderPosition() + (int) HopperConstants.TICKS_PER_STEP);
-        }
-        if (gp.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-            hopper.toPositionRaw(hopper.getEncoderPosition() - (int) HopperConstants.TICKS_PER_STEP);
-        }
-
-
-
-
-        telemetry.addData("Raw Encoder", hopper.getEncoderPosition());
-        telemetry.update();
     }
 
 }
