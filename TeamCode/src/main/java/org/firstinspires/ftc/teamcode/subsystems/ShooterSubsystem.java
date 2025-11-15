@@ -50,4 +50,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public double getVelocity() {
         return shooterMotor.getVelocity() * 60 / ShooterConstants.MOTOR_RESOLUTION;
     }
+
+    public double getMotorPower(){
+        return shooterMotor.getPower();
+    }
 }

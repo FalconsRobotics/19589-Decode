@@ -29,8 +29,11 @@ public class HopperSubsystem extends SubsystemBase {
     /// Booleans used during initialization of the hopper
     public boolean isHomed, magnetSeenDuringHoming;
 
-    ///
+    /// Which position rotor is at (null if in between)
     public Integer currentPosition;
+
+    ///
+    public int targetPosition;
 
 
     /**
@@ -52,7 +55,9 @@ public class HopperSubsystem extends SubsystemBase {
 
         isHomed = false;
         magnetSeenDuringHoming = false;
+
         currentPosition = null;
+        targetPosition = 0;
     }
 
     /// Run During init() Stage of TeleOp; Rotates hopper until it is physically zeroed with the magnet switch
@@ -69,6 +74,7 @@ public class HopperSubsystem extends SubsystemBase {
         else {
             this.setServoPower(0.0);
             this.zeroEncoder();
+            this.targetPosition = 0;
         }
     }
 
@@ -87,8 +93,12 @@ public class HopperSubsystem extends SubsystemBase {
                 && getEncoderPosition() >= 2 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS)) {
             return 2;
         }
-        else if (getEncoderPosition() <= 3 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
-                && getEncoderPosition() >= 3 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS) || getEncoderPosition() <= HopperConstants.TOLERANCE_TICKS) {
+        else if (
+                (getEncoderPosition() <= 3 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
+                        && getEncoderPosition() >= 3 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS))
+                ||
+                        (getEncoderPosition() <= HopperConstants.TOLERANCE_TICKS)
+                                && getEncoderPosition() >= -HopperConstants.TOLERANCE_TICKS) {
             return 2;
         }
         else return null;
@@ -136,7 +146,7 @@ public class HopperSubsystem extends SubsystemBase {
      * Rotates servo counter-clockwise to 1 of 3 hopper positions
      * @param position target hopper position
      */
-    public void intakeToHopperPosition(int position) {
+    public void intakeToHopperPosition(Integer position) {
 
     }
 
@@ -144,8 +154,18 @@ public class HopperSubsystem extends SubsystemBase {
      * Rotates servo clockwise to 1 of 3 hopper positions
      * @param position target hopper position
      */
-    public void extakeToHopperPosition(int position) {
+    public void extakeToHopperPosition(Integer position) {
 
+    }
+
+    /// Moves ccw 1 position
+    public void intakeOneTick() {
+        toPositionRaw(getEncoderPosition() + (int) HopperConstants.TICKS_PER_STEP);
+    }
+
+    /// Moves cw 1 position
+    public void extakeOneTick() {
+        toPositionRaw(getEncoderPosition() - (int) HopperConstants.TICKS_PER_STEP);
     }
 
     /// @return The distance from the Top Sensor
