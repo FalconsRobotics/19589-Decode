@@ -83,7 +83,7 @@ public class MainTeleOp extends CommandOpMode {
                 telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.INCH));
                 telemetry.addData("Odo A", drive.odo.getHeading(AngleUnit.DEGREES));
 
-                telemetry.addData("Shooter Speed", shooter.getVelocity());
+                dashboard.addData("Shooter Speed", shooter.getVelocity());
 
                 dashboard.update();
 
