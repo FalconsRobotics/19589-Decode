@@ -34,9 +34,4 @@ public class FieldDriveLockCommand extends CommandBase {
         // Call the DrivebaseSubsystem drive function using our supplied movement values.
         this.drive.driveFieldCentricHeadingLock(strafePower.getAsDouble(), forwardPower.getAsDouble(), angleTurn);
     }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
 }
