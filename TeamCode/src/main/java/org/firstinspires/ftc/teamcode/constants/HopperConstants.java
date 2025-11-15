@@ -9,5 +9,5 @@ public class HopperConstants {
     public static double HOMING_POWER = 0.1;
     public static double MOVE_KP = 0.002;
     public static double MOVE_MAX = 0.5;
-    public static int TOLERANCE_TICKS = 20;
+    public static int TOLERANCE_TICKS = 10;
 }

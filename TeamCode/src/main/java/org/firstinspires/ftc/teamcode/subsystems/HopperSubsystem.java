@@ -87,8 +87,12 @@ public class HopperSubsystem extends SubsystemBase {
                 && getEncoderPosition() >= 2 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS)) {
             return 2;
         }
-        else if (getEncoderPosition() <= 3 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
-                && getEncoderPosition() >= 3 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS) || getEncoderPosition() <= HopperConstants.TOLERANCE_TICKS) {
+        else if (
+                (getEncoderPosition() <= 3 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS &&
+                        getEncoderPosition() >= 3 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS))
+                ||
+                        (getEncoderPosition() <= HopperConstants.TOLERANCE_TICKS) &&
+                                getEncoderPosition() >= -HopperConstants.TOLERANCE_TICKS) {
             return 2;
         }
         else return null;
