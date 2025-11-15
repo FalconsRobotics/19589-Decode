@@ -150,9 +150,9 @@ public class HopperSubsystem extends SubsystemBase {
     }
 
     /// @return The distance from the Top Sensor
-    public double getTopDistance() {
-        return topSensor.getDistance(DistanceUnit.MM);
-    }
+//    public double getTopDistance() {
+//        return topSensor.getDistance(DistanceUnit.MM);
+//    }
 
     /// @return The distance from the Bottom Sensor
     public double getBottomDistance() {
@@ -160,9 +160,9 @@ public class HopperSubsystem extends SubsystemBase {
     }
 
     /// @return The color returned from the Top Sensor
-    public NormalizedRGBA getTopColor() {
-        return topSensor.getNormalizedColors();
-    }
+//    public NormalizedRGBA getTopColor() {
+//        return topSensor.getNormalizedColors();
+//    }
 
     /// @return The color returned from the Bottom Sensor
     public NormalizedRGBA getBottomColor() {

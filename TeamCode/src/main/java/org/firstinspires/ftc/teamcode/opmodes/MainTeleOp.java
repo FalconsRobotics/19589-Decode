@@ -12,13 +12,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.commands.FaceAllianceGoalCommand;
 import org.firstinspires.ftc.teamcode.commands.FieldDriveCommand;
 import org.firstinspires.ftc.teamcode.commands.FieldDriveLockCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeSetPowerCommand;
 import org.firstinspires.ftc.teamcode.commands.PeriodicFunctionCommand;
 import org.firstinspires.ftc.teamcode.commands.RobotDriveCommand;
+import org.firstinspires.ftc.teamcode.commands.ShooterSetSpeedCommand;
+import org.firstinspires.ftc.teamcode.constants.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.HopperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
@@ -31,15 +36,15 @@ public class MainTeleOp extends CommandOpMode {
     // Objects to store our subsystems.
     public DrivebaseSubsystem drive;
     public IntakeSubsystem intake;
+    public HopperSubsystem hopper;
     public ShooterSubsystem shooter;
     public VisionSubsystem vision;
+
+    public double angleDifference;
 
     // Objects to store our Gamepads, using the SolversLib GamepadEx to take advantage
     // of its conveniences for tracking button presses.
     GamepadEx Gamepad1, Gamepad2;
-
-    // Alliance for goal selection
-    private boolean isRedAlliance = true; // default; change as you like
 
     @Override
     public void initialize() {
@@ -47,43 +52,46 @@ public class MainTeleOp extends CommandOpMode {
         // their own motors, servos, etc.
         drive = new DrivebaseSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
-        shooter = new ShooterSubsystem();
+        shooter = new ShooterSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, this.drive);
 
+        vision.ll.pipelineSwitch(1);
+
+        // Initialize the FTC Dashboard Telemetry instance so we can print and graph data on the web console.
         Telemetry dashboard = FtcDashboard.getInstance().getTelemetry();
 
-        // Intialize our gamepads by passing in the existing built-in FTC gamepad objects.
+        // Initialize our gamepads by passing in the existing built-in FTC gamepad objects.
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
 
         // Tell SolversLib that this OpMode needs the drivebase and intake to function.
-        register(drive, intake);
+        register(drive, intake, shooter, vision);
 
         // Schedule any commands that need to be repeated for the entire OpMode.
         schedule(new PeriodicFunctionCommand(this.drive, this.intake, this.shooter, this.vision));
 
+        //region Telemetry
+        /// ==================================================
+
+        // Schedule the telemetry updating inside a new command that has no exit condition, meaning
+        // it will run throughout the entire OpMode.
         schedule(new CommandBase() {
             @Override
             public void execute() {
                 telemetry.update();
-                telemetry.addData("Odo X", drive.odo.getPosX(DistanceUnit.MM));
-                telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.MM));
+                telemetry.addData("Odo X", drive.odo.getPosX(DistanceUnit.INCH));
+                telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.INCH));
                 telemetry.addData("Odo A", drive.odo.getHeading(AngleUnit.DEGREES));
-                telemetry.addLine();
+
+                telemetry.addData("Shooter Speed", shooter.getVelocity());
 
                 dashboard.update();
-                dashboard.addData("LF", drive.frontLeftMotor.get());
-                dashboard.addData("LR", drive.frontRightMotor.get());
-                dashboard.addData("BL", drive.backLeftMotor.get());
-                dashboard.addData("BR", drive.backRightMotor.get());
 
-                dashboard.addData("Current Heading", drive.currentAngle);
-                dashboard.addData("Target Heading", drive.targetAngle);
-                dashboard.addData("Angle Error", drive.angleError);
-
-//                dashboard.addData("");
             }
         });
+
+        /// ==================================================
+        //endregion
 
         //region Robot-Centric Driving Code
         /// ==================================================
@@ -153,27 +161,34 @@ public class MainTeleOp extends CommandOpMode {
                 )
         );
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileHeld(
-                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0, -90)
-        );
-
-        Gamepad1.getGamepadButton(GamepadKeys.Button.B).whileHeld(
-                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0, 180)
-        );
-
-        Gamepad1.getGamepadButton(GamepadKeys.Button.X).whileHeld(
-                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0,0)
-        );
-
         Gamepad1.getGamepadButton(GamepadKeys.Button.Y).whileHeld(
-                new FieldDriveLockCommand(drive, () -> 0.0, () -> 0.0, 90)
+                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, drive.normalizeTo180Deg(Math.toDegrees(Math.atan2(72 - drive.odo.getPosX(DistanceUnit.INCH), -72 - drive.odo.getPosY(DistanceUnit.INCH)))))
         );
-    }
 
-    // Might not be necessary, as the OpMode already runs as-is. Should not run more than
-    // its super function.
-    @Override
-    public void run() {
-        super.run();
+        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileHeld(
+                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, drive.normalizeTo180Deg(Math.toDegrees(Math.atan2(72 - drive.odo.getPosX(DistanceUnit.INCH), 72 - drive.odo.getPosY(DistanceUnit.INCH)))))
+        );
+
+        //endregion
+
+        //region Intake Control Code
+
+        // The Intake should, by default, run at 1.0 speed to intake balls in.
+        intake.setDefaultCommand(new IntakeSetPowerCommand(intake, () -> 1.0));
+
+        // Whenever the Utility driver
+        new Trigger(() -> Gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.5).whileActiveContinuous(
+                new IntakeSetPowerCommand(intake, () -> -1.0)
+        );
+
+        //endregion
+
+        //region Extake/Shooter Control Code
+        /// ==================================================
+
+        shooter.setDefaultCommand(new ShooterSetSpeedCommand(shooter, () -> 4500));
+
+        /// ==================================================
+        //endregion
     }
 }

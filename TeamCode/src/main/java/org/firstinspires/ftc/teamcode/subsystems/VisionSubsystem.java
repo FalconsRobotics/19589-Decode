@@ -32,51 +32,41 @@ public class VisionSubsystem extends SubsystemBase {
 
         ll = map.get(Limelight3A.class, "limelight");
         ll.setPollRateHz(60);
-        ll.pipelineSwitch(0);
+//        ll.pipelineSwitch(0);
         ll.start();
     }
 
     @Override
     public void periodic() {
-        driveInstance.odo.update();
         result = ll.getLatestResult();
 
         double yawDeg = driveInstance.odo.getHeading(AngleUnit.DEGREES);
         // If your odo increases CW, invert it:
-        yawDeg = -yawDeg;
-        ll.updateRobotOrientation(yawDeg);
-
-        // Cache most recent valid MT2 2D pose
-        if (result != null && result.isValid()) {
-            Pose3D mt2 = result.getBotpose_MT2();
-            if (mt2 != null) {
-                lastLLPose2d = new Pose2D(
-                        DistanceUnit.METER,
-                        mt2.getPosition().x,
-                        mt2.getPosition().y,
-                        AngleUnit.DEGREES,
-                        yawDeg
-                );
-                lastLLPoseMillis = System.currentTimeMillis();
-            }
-        }
+//        yawDeg = -yawDeg;
+//        ll.updateRobotOrientation(yawDeg);
     }
 
     // ----------------------------
     // Limelight helpers (for commands/telemetry)
     // ----------------------------
 
-    public double geTx (){
-        return result.getTx();
+    public double getTX() {
+        if (result != null) {
+            if (result.isValid()) {
+                return result.getTx();
+            }
+        }
+
+        return 0;
     }
 
     /** returns the motif value*/
-    public int getMotif(){
+    public int getMotif() {
         return motif;
     }
 
     /** Finds the tag id and sets motif to value 1, 2, or 3 depending on tag. Motif value of 0 means no tag was detected*/
-    public void findMotif(){
+    public void findMotif() {
         ll.pipelineSwitch(0);
         List<LLResultTypes.FiducialResult> fidRes = result.getFiducialResults();
 
