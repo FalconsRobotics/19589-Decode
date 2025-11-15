@@ -21,12 +21,16 @@ public class HopperSubsystem extends SubsystemBase {
     private final DcMotor encoder;
 
     /// Object that references the Axon Servo's encoder wire
-    private final RevColorSensorV3 topSensor, bottomSensor;
+    private final RevColorSensorV3 bottomSensor;
 
     /// Object that references the magnet switch on rotor
     private final DigitalChannel magSwitch;
 
+    /// Booleans used during initialization of the hopper
     public boolean isHomed, magnetSeenDuringHoming;
+
+    ///
+    public Integer currentPosition;
 
 
     /**
@@ -49,11 +53,46 @@ public class HopperSubsystem extends SubsystemBase {
 
         isHomed = false;
         magnetSeenDuringHoming = false;
+        currentPosition = null;
+    }
+
+    /// Run During init() Stage of TeleOp; Rotates hopper until it is physically zeroed with the magnet switch
+    public void runToMagnetZero() {
+        if (!this.isHomed) {
+            if (!this.magnetIsActive()) {
+                this.setServoPower(HopperConstants.HOMING_POWER);
+            }
+            else {
+                this.setServoPower(0.0);
+                this.isHomed = true;
+            }
+        }
+        else {
+            this.setServoPower(0.0);
+            this.zeroEncoder();
+        }
     }
 
     ///@return The position of the servo using the Through Bore Encoder
-    public int getServoPosition() {
+    public int getEncoderPosition() {
         return encoder.getCurrentPosition();
+    }
+
+    /// @return The current position of the hopper
+    public Integer getHopperPosition() {
+        if (getEncoderPosition() <= 1 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
+                && getEncoderPosition() >= 1 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS)) {
+            return 1;
+        }
+        else if (getEncoderPosition() <= 2 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
+                && getEncoderPosition() >= 2 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS)) {
+            return 2;
+        }
+        else if (getEncoderPosition() <= 3 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
+                && getEncoderPosition() >= 3 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS) || getEncoderPosition() <= HopperConstants.TOLERANCE_TICKS) {
+            return 2;
+        }
+        else return null;
     }
 
     ///@return The power of the rotating servo
@@ -73,19 +112,41 @@ public class HopperSubsystem extends SubsystemBase {
      * Rotates servo to an encoder position
      * @param target target position
      */
-    public void toPosition(int target) {
-        int error = target - getServoPosition();
+    public void toPositionRaw(int target) {
+        int error = target - getEncoderPosition();
         double proportional = (double) target * HopperConstants.MOVE_KP;
+        double directionalMoveMax = Math.signum(error) * HopperConstants.MOVE_MAX;
 
-        if (Math.signum(error) == 1) {
-            setServoPower(Math.min(HopperConstants.MOVE_MIN, proportional));
-        }
-        else if (Math.signum(error) == -1) {
-            setServoPower(Math.max(-HopperConstants.MOVE_MIN, proportional));
-        }
-        else {
+        if (error <= HopperConstants.TOLERANCE_TICKS) {
             setServoPower(0);
         }
+        else {
+            if (Math.signum(error) == 1) {
+                setServoPower(Math.min(directionalMoveMax, proportional));
+            }
+            else if (Math.signum(error) == -1) {
+                setServoPower(Math.max(directionalMoveMax, proportional));
+            }
+            else {
+                setServoPower(0);
+            }
+        }
+    }
+
+    /**
+     * Rotates servo counter-clockwise to 1 of 3 hopper positions
+     * @param position target hopper position
+     */
+    public void intakeToHopperPosition(int position) {
+
+    }
+
+    /**
+     * Rotates servo clockwise to 1 of 3 hopper positions
+     * @param position target hopper position
+     */
+    public void extakeToHopperPosition(int position) {
+
     }
 
     /// @return The distance from the Top Sensor
