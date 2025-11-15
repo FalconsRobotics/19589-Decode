@@ -38,6 +38,8 @@ public class ShooterTester extends CommandOpMode {
 
                 dashboard. addData("Motor Power: ", shooter.getMotorPower());
 
+                dashboard.addData("Error: ", shooter.getError());
+
                 dashboard.update();
 
             }
