@@ -9,11 +9,9 @@ import org.firstinspires.ftc.teamcode.subsystems.HopperSubsystem;
 @TeleOp(name = "Sensor Testing", group = "test")
 public class SensorTesting extends LinearOpMode {
     public HopperSubsystem hopper;
-    public GamepadEx gp;
 
     public void runOpMode() {
         hopper = new HopperSubsystem(hardwareMap);
-        gp = new GamepadEx(gamepad1);
 
         while (opModeInInit()) {
 
@@ -22,7 +20,7 @@ public class SensorTesting extends LinearOpMode {
         while (opModeIsActive()) {
 
 
-            telemetry.addData("Sensor Detecting")
+            telemetry.addData("Sensor Detecting", hopper.getBottomDistance());
             telemetry.update();
         }
     }

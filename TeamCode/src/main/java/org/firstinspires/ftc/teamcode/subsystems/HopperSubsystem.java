@@ -48,7 +48,6 @@ public class HopperSubsystem extends SubsystemBase {
         magSwitch = map.get(DigitalChannel.class, "MagnetSwitch");
         magSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-        topSensor = map.get(RevColorSensorV3.class, "TopSensor");
         bottomSensor = map.get(RevColorSensorV3.class, "BottomSensor");
 
         isHomed = false;
