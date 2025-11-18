@@ -63,8 +63,6 @@ public class MainTeleOp extends CommandOpMode {
         } else if (Gamepad1.isDown(GamepadKeys.Button.DPAD_RIGHT)) {
             isRedAlliance = false;
         }
-
-        super.initialize_loop();
     }
 
     // TODO: Convert Utility functions to the Utility Gamepad.
@@ -78,8 +76,7 @@ public class MainTeleOp extends CommandOpMode {
         shooter = new ShooterSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, this.drive);
 
-        hopper.zeroEncoder();
-//        drive.odo.setHeading(90, AngleUnit.DEGREES);
+        hopper.runToMagnetZero();
 
         // Initialize the FTC Dashboard Telemetry instance so we can print and graph data on the web console.
         dashboard = FtcDashboard.getInstance().getTelemetry();
@@ -96,22 +93,13 @@ public class MainTeleOp extends CommandOpMode {
 
         // Unless the drivebase is going to be used by another command, the default thing it should do is just drive field-centrically.
         drive.setDefaultCommand(
-            // Conditional command: If the condition (are you on red alliance?), then drive with normal joystick inputs. Otherwise,
-            // drive with reversed joystick inputs.
-            new ConditionalCommand(
-                new FieldDriveLockCommand(
-                        drive,
-                        Gamepad1::getLeftX,
-                        Gamepad1::getLeftY,
-                        () -> lastHeadingLock
-                ),
-                new FieldDriveLockCommand(
-                        drive,
-                        () -> -Gamepad1.getLeftX(),
-                        () -> -Gamepad1.getLeftY(),
-                        () -> lastHeadingLock
-                ),
-                () -> isRedAlliance
+            new FieldDriveLockCommand(
+                    drive,
+//                    Gamepad1::getLeftX,
+//                    Gamepad1::getLeftY,
+                    () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
+                    () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
+                    () -> lastHeadingLock
             )
         );
 
@@ -121,12 +109,32 @@ public class MainTeleOp extends CommandOpMode {
         new Trigger(() -> Math.hypot(Gamepad1.getRightX(), Gamepad1.getRightY()) >= 0.5).whileActiveContinuous(
             new InstantCommand(() -> {
                 if (isRedAlliance) {
-                    lastHeadingLock = Math.toDegrees(Math.atan2(-Gamepad1.getRightY(), Gamepad1.getRightX()));
-                } else {
                     lastHeadingLock = Math.toDegrees(Math.atan2(Gamepad1.getRightY(), -Gamepad1.getRightX()));
+                } else {
+                    lastHeadingLock = Math.toDegrees(Math.atan2(-Gamepad1.getRightY(), Gamepad1.getRightX()));
                 }
             })
-        ) ;
+        );
+
+        // When pressing X, we want to aim towards the respective goal when in the close position.
+        Gamepad1.getGamepadButton(GamepadKeys.Button.X).whileHeld(
+                new FieldDriveLockCommand(
+                        drive,
+                        () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
+                        () -> isRedAlliance ? -Gamepad1.getLeftY() : Gamepad1.getLeftY(),
+                        () -> isRedAlliance ? 45 : 135
+                )
+        );
+
+        // When pressing B, we want to aim towards the respective goal when in the far position.
+        Gamepad1.getGamepadButton(GamepadKeys.Button.B).whileHeld(
+                new FieldDriveLockCommand(
+                        drive,
+                        () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
+                        () -> isRedAlliance ? -Gamepad1.getLeftY() : Gamepad1.getLeftY(),
+                        () -> isRedAlliance ? 70 : 114
+                )
+        );
 
         //endregion
 
