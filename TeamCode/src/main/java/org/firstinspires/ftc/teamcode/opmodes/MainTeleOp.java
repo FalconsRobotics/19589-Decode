@@ -64,7 +64,7 @@ public class MainTeleOp extends CommandOpMode {
             isRedAlliance = false;
         }
 
-        super.run();
+        super.initialize_loop();
     }
 
     // TODO: Convert Utility functions to the Utility Gamepad.
