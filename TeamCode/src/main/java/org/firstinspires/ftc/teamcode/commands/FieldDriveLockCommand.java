@@ -18,7 +18,7 @@ public class FieldDriveLockCommand extends CommandBase {
     // DoubleSuppliers that track the gamepad inputs.
     private final DoubleSupplier forwardPower;
     private final DoubleSupplier strafePower;
-    private final double angleTurn;
+    private final DoubleSupplier angleTurn;
 
     /**
      * Initializes the FieldDriveLockCommand.
@@ -27,7 +27,7 @@ public class FieldDriveLockCommand extends CommandBase {
      * @param suppliedForward Reference to the forward power you want the robot to move.
      * @param suppliedAngle Reference to the angle you want the robot to lock to.
      */
-    public FieldDriveLockCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedForward, double suppliedAngle) {
+    public FieldDriveLockCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedForward, DoubleSupplier suppliedAngle) {
         // Set the internal members to our passed-in values, so that this command uses the inputs
         // and subsystems from our OpMode.
         this.drive = suppliedDrive;
@@ -42,6 +42,6 @@ public class FieldDriveLockCommand extends CommandBase {
     @Override
     public void execute() {
         // Call the DrivebaseSubsystem drive function using our supplied movement values.
-        this.drive.driveFieldCentricHeadingLock(strafePower.getAsDouble(), forwardPower.getAsDouble(), angleTurn);
+        this.drive.driveFieldCentricHeadingLock(strafePower.getAsDouble(), forwardPower.getAsDouble(), angleTurn.getAsDouble());
     }
 }

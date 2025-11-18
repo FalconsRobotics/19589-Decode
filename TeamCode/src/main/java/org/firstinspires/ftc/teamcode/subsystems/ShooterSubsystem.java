@@ -15,7 +15,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // Object used to store the motor reference.
     DcMotorEx shooterMotor;
 
-    private double targetSpeed = 0.0;
+    public double targetSpeed = 0.0;
 
     /**
      * Initialize the ShooterSubsystem.

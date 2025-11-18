@@ -77,8 +77,6 @@ public class DrivebaseSubsystem extends SubsystemBase {
 //        odo.recalibrateIMU();
 //        odo.resetPosAndIMU();
 
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, -60, AngleUnit.DEGREES, 90));
-
         pidTimer = new ElapsedTime();
     }
 

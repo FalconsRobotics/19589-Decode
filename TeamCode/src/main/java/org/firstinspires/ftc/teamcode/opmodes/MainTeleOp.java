@@ -1,26 +1,31 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.seattlesolvers.solverslib.command.CommandBase;
-import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.button.Trigger;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.commands.FieldDriveLockCommand;
 import org.firstinspires.ftc.teamcode.commands.HopperCycleCCWCommand;
 import org.firstinspires.ftc.teamcode.commands.HopperCycleCWCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeSetPowerCommand;
 import org.firstinspires.ftc.teamcode.commands.ShooterSetSpeedCommand;
+import org.firstinspires.ftc.teamcode.constants.ShooterConstants;
 import org.firstinspires.ftc.teamcode.subsystems.DrivebaseSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.HopperSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
+
+import com.seattlesolvers.solverslib.command.CommandBase;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.ConditionalCommand;
+import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.button.Trigger;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+
+import com.acmerobotics.dashboard.FtcDashboard;
 
 @TeleOp(name = "TeleOp - Open Warfare")
 public class MainTeleOp extends CommandOpMode {
@@ -31,18 +36,14 @@ public class MainTeleOp extends CommandOpMode {
     public ShooterSubsystem shooter;
     public VisionSubsystem vision;
 
+    public Telemetry dashboard;
+
     // Objects to store our Gamepads, using the SolversLib GamepadEx to take advantage
     // of its conveniences for tracking button presses.
     private GamepadEx Gamepad1, Gamepad2;
 
     // If Red, this is true. If Blue, this is false.
-    private boolean isRedAlliance = false;
-
-    // If starting from far, this is false. If starting from close, this is true;
-    private boolean isStartingClose = false;
-
-    // Stores whether we are trying to lock to a heading or not.
-    private boolean goalLock = false;
+    private boolean isRedAlliance = true;
 
     // Stores the last angle we want to lock the heading to.
     private double lastHeadingLock = 0.0;
@@ -53,9 +54,9 @@ public class MainTeleOp extends CommandOpMode {
         // Set starting close by pressing X, far by pressing B.
         telemetry.update();
         telemetry.addLine("RED: DPAD_LEFT, BLUE: DPAD_RIGHT");
-        telemetry.addLine("CLOSE: X, FAR: B");
+//        telemetry.addLine("CLOSE: X, FAR: B");
         telemetry.addData("Is Red", isRedAlliance);
-        telemetry.addData("Is Close", isStartingClose);
+//        telemetry.addData("Is Close", isStartingClose);
 
         if (Gamepad1.isDown(GamepadKeys.Button.DPAD_LEFT)) {
             isRedAlliance = true;
@@ -63,95 +64,106 @@ public class MainTeleOp extends CommandOpMode {
             isRedAlliance = false;
         }
 
-        if (Gamepad1.isDown(GamepadKeys.Button.X)) {
-            isStartingClose = true;
-        } else if (Gamepad1.isDown(GamepadKeys.Button.B)) {
-            isStartingClose = false;
-        }
+        super.run();
     }
 
+    // TODO: Convert Utility functions to the Utility Gamepad.
     @Override
     public void initialize() {
         // Initialize our subsystems by passing in the HardwareMap, so they can each initialize
         // their own motors, servos, etc.
         drive = new DrivebaseSubsystem(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap);
+        hopper = new HopperSubsystem(hardwareMap);
         shooter = new ShooterSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, this.drive);
 
-        vision.ll.pipelineSwitch(1);
+        hopper.zeroEncoder();
+//        drive.odo.setHeading(90, AngleUnit.DEGREES);
 
         // Initialize the FTC Dashboard Telemetry instance so we can print and graph data on the web console.
-        Telemetry dashboard = FtcDashboard.getInstance().getTelemetry();
+        dashboard = FtcDashboard.getInstance().getTelemetry();
 
         // Initialize our gamepads by passing in the existing built-in FTC gamepad objects.
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
 
-        waitForStart();
+        // Tell SolversLib that this OpMode needs the drivebase, intake, hopper, shooter, and vision to function.
+        register(drive, intake, hopper, shooter, vision);
 
-        // Tell SolversLib that this OpMode needs the drivebase and intake to function.
-        register(drive, intake, shooter, vision);
-
-        //region Telemetry
+        //region Driving Code
         /// ==================================================
 
-        // Schedule the telemetry updating inside a new command that has no exit condition, meaning
-        // it will run throughout the entire OpMode.
-        schedule(new CommandBase() {
-            @Override
-            public void execute() {
-                telemetry.update();
-                telemetry.addData("Odo X", drive.odo.getPosX(DistanceUnit.INCH));
-                telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.INCH));
-                telemetry.addData("Odo A", drive.odo.getHeading(AngleUnit.DEGREES));
-
-                telemetry.addData("Shooter Speed", shooter.getVelocity());
-                telemetry.addData("R Angle", Math.toDegrees(Math.atan2(-Gamepad1.getRightY(), -Gamepad1.getRightX())));
-                dashboard.addData("Shooter Speed", shooter.getVelocity());
-
-                dashboard.update();
-
-            }
-        });
-        //endregion
-
-        //region Field-Centric Driving Code
-        /// ==================================================
-        Gamepad1.getGamepadButton(GamepadKeys.Button.Y).whileHeld(
-                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, drive.normalizeTo180Deg(Math.toDegrees(Math.atan2(72 - drive.odo.getPosX(DistanceUnit.INCH), -72 - drive.odo.getPosY(DistanceUnit.INCH)))))
+        // Unless the drivebase is going to be used by another command, the default thing it should do is just drive field-centrically.
+        drive.setDefaultCommand(
+            // Conditional command: If the condition (are you on red alliance?), then drive with normal joystick inputs. Otherwise,
+            // drive with reversed joystick inputs.
+            new ConditionalCommand(
+                new FieldDriveLockCommand(
+                        drive,
+                        Gamepad1::getLeftX,
+                        Gamepad1::getLeftY,
+                        () -> lastHeadingLock
+                ),
+                new FieldDriveLockCommand(
+                        drive,
+                        () -> -Gamepad1.getLeftX(),
+                        () -> -Gamepad1.getLeftY(),
+                        () -> lastHeadingLock
+                ),
+                () -> isRedAlliance
+            )
         );
 
-        Gamepad1.getGamepadButton(GamepadKeys.Button.A).whileHeld(
-                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, drive.normalizeTo180Deg(Math.toDegrees(Math.atan2(72 - drive.odo.getPosX(DistanceUnit.INCH), 72 - drive.odo.getPosY(DistanceUnit.INCH)))))
-        );
-
-        new Trigger(() -> Gamepad1.getRightX() >= 0.5).whileActiveContinuous(
-                new FieldDriveLockCommand(drive, Gamepad1::getLeftX, Gamepad1::getLeftY, drive.normalizeTo180Deg(Math.toDegrees(Math.atan2(Gamepad1.getRightX(), -Gamepad1.getRightY()))))
-        );
+        // The robot needs to indefinitely track whether the joystick magnitude is greater than 0.5, and set a new heading angle if so.
+        // It checks if it's greater than 0.5 because returning the joystick to (0, 0) sets the angle to 0, and we need to prevent accidental touches.
+        // We do this by making a trigger that repeatedly checks whenever the joystick magnitude is greater than 0.5
+        new Trigger(() -> Math.hypot(Gamepad1.getRightX(), Gamepad1.getRightY()) >= 0.5).whileActiveContinuous(
+            new InstantCommand(() -> {
+                if (isRedAlliance) {
+                    lastHeadingLock = Math.toDegrees(Math.atan2(-Gamepad1.getRightY(), Gamepad1.getRightX()));
+                } else {
+                    lastHeadingLock = Math.toDegrees(Math.atan2(Gamepad1.getRightY(), -Gamepad1.getRightX()));
+                }
+            })
+        ) ;
 
         //endregion
 
         //region Intake Control Code
+        /// ==================================================
 
         // The Intake should, by default, run at 1.0 speed to intake balls in.
         intake.setDefaultCommand(new IntakeSetPowerCommand(intake, () -> 1.0));
 
-        // Whenever the Utility driver
+        // Whenever the Utility driver presses the right trigger more than halfway, the intake should reverse.
         new Trigger(() -> Gamepad2.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.5)
             .whileActiveContinuous(
                 new IntakeSetPowerCommand(intake, () -> -1.0)
             );
 
+        /// ==================================================
         //endregion
 
         //region Hopper Control Code
         /// ==================================================
 
+        // When Utility presses the Left Bumper, we want to rotate clockwise, which shoots a ball.
+        // But, we only want to do this whenever
         Gamepad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileActiveOnce(
-                new HopperCycleCWCommand(hopper)
+            // Conditional command: If the condition (either shooter is in the correct speed range OR the "override" A button is pressed)
+            // is true, only then do we want to shoot. Otherwise, don't shoot, and just rumble the controller to signal to Utility that
+            // you're not in the correct velocity range.
+            new ConditionalCommand(
+                    new HopperCycleCWCommand(hopper),
+                    new InstantCommand(() -> gamepad1.rumbleBlips(3)),
+                    () -> (shooter.getVelocity() > shooter.targetSpeed - ShooterConstants.SPEED_TOLERANCE &&
+                            shooter.getVelocity() < shooter.targetSpeed + ShooterConstants.SPEED_TOLERANCE) ||
+                            Gamepad1.getButton(GamepadKeys.Button.A)
+            )
         );
 
+        // When Utility presses the Right Bumper, we want to rotate counterclockwise, which intakes a ball.
         Gamepad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileActiveOnce(
                 new HopperCycleCCWCommand(hopper)
         );
@@ -166,5 +178,38 @@ public class MainTeleOp extends CommandOpMode {
 
         /// ==================================================
         //endregion
+
+        //region Miscellaneous Code
+        /// ==================================================
+
+        // We need an emergency heading reset, just in case!
+        Gamepad2.getGamepadButton(GamepadKeys.Button.OPTIONS).whileActiveOnce(new CommandBase() {
+            @Override
+            public void execute() {
+                 drive.resetHeadingPID();
+            }
+        });
+
+        /// ==================================================
+        //endregion
+    }
+
+    @Override
+    public void run() {
+        telemetry.update();
+        telemetry.addData("Odo X", drive.odo.getPosX(DistanceUnit.INCH));
+        telemetry.addData("Odo Y", drive.odo.getPosY(DistanceUnit.INCH));
+        telemetry.addData("Odo A", drive.odo.getHeading(AngleUnit.DEGREES));
+
+        telemetry.addData("Last Heading Target", lastHeadingLock);
+        telemetry.addData("Stick Hypot", Math.hypot(Gamepad1.getRightX(), Gamepad1.getRightY()));
+
+        telemetry.addData("Shooter Speed", shooter.getVelocity());
+        telemetry.addData("R Angle", Math.toDegrees(Math.atan2(-Gamepad1.getRightY(), -Gamepad1.getRightX())));
+        dashboard.addData("Shooter Speed", shooter.getVelocity());
+
+        dashboard.update();
+
+        super.run();
     }
 }

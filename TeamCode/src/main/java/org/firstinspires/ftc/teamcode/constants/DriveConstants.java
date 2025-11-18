@@ -9,7 +9,7 @@ public class DriveConstants {
     public static double DRIVE_KD = -0.003;
 
     // Constant used to limit the maximum acceleration to prevent tipping.
-    public static double MAX_ACCEL_CHANGE = 0.05;
+    public static double MAX_ACCEL_CHANGE = 0.1;
 
     // The difference in heading that the robot will consider to be "lined up".
     public static double HEADING_TOLERANCE = 5;
