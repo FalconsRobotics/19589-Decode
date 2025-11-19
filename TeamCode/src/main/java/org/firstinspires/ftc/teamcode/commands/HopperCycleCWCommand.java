@@ -22,7 +22,7 @@ public class HopperCycleCWCommand extends CommandBase {
 
     @Override
     public void execute() {
-        this.hopper.extakeOneTick();
+        this.hopper.rotateHopperOnePosition(-1);
     }
 
     @Override

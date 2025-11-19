@@ -76,8 +76,6 @@ public class MainTeleOp extends CommandOpMode {
         shooter = new ShooterSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap, this.drive);
 
-        hopper.runToMagnetZero();
-
         // Initialize the FTC Dashboard Telemetry instance so we can print and graph data on the web console.
         dashboard = FtcDashboard.getInstance().getTelemetry();
 
@@ -120,9 +118,9 @@ public class MainTeleOp extends CommandOpMode {
         Gamepad1.getGamepadButton(GamepadKeys.Button.X).whileHeld(
                 new FieldDriveLockCommand(
                         drive,
+                        () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                         () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                        () -> isRedAlliance ? -Gamepad1.getLeftY() : Gamepad1.getLeftY(),
-                        () -> isRedAlliance ? 45 : 135
+                        () -> isRedAlliance ? -45 : 45
                 )
         );
 
@@ -130,9 +128,9 @@ public class MainTeleOp extends CommandOpMode {
         Gamepad1.getGamepadButton(GamepadKeys.Button.B).whileHeld(
                 new FieldDriveLockCommand(
                         drive,
+                        () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                         () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                        () -> isRedAlliance ? -Gamepad1.getLeftY() : Gamepad1.getLeftY(),
-                        () -> isRedAlliance ? 70 : 114
+                        () -> isRedAlliance ? -27.5 : 27.5
                 )
         );
 
@@ -158,23 +156,21 @@ public class MainTeleOp extends CommandOpMode {
 
         // When Utility presses the Left Bumper, we want to rotate clockwise, which shoots a ball.
         // But, we only want to do this whenever
-        Gamepad1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileActiveOnce(
-            // Conditional command: If the condition (either shooter is in the correct speed range OR the "override" A button is pressed)
-            // is true, only then do we want to shoot. Otherwise, don't shoot, and just rumble the controller to signal to Utility that
-            // you're not in the correct velocity range.
-            new ConditionalCommand(
-                    new HopperCycleCWCommand(hopper),
-                    new InstantCommand(() -> gamepad1.rumbleBlips(3)),
-                    () -> (shooter.getVelocity() > shooter.targetSpeed - ShooterConstants.SPEED_TOLERANCE &&
-                            shooter.getVelocity() < shooter.targetSpeed + ShooterConstants.SPEED_TOLERANCE) ||
-                            Gamepad1.getButton(GamepadKeys.Button.A)
-            )
-        );
-
-        // When Utility presses the Right Bumper, we want to rotate counterclockwise, which intakes a ball.
-        Gamepad1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileActiveOnce(
-                new HopperCycleCCWCommand(hopper)
-        );
+//        Gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileActiveOnce(
+//            // Conditional command: If the condition (either shooter is in the correct speed range OR the "override" A button is pressed)
+//            // is true, only then do we want to shoot. Otherwise, don't shoot, and just rumble the controller to signal to Utility that
+//            // you're not in the correct velocity range.
+//            new ConditionalCommand(
+//                    new HopperCycleCWCommand(hopper),
+//                    new InstantCommand(() -> gamepad1.rumbleBlips(3)),
+//                    () -> shooter.isInTargetSpeed() || Gamepad1.getButton(GamepadKeys.Button.A)
+//            )
+//        );
+//
+//        // When Utility presses the Right Bumper, we want to rotate counterclockwise, which intakes a ball.
+//        Gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileActiveOnce(
+//                new HopperCycleCCWCommand(hopper)
+//        );
 
         /// ==================================================
         //endregion
@@ -212,9 +208,8 @@ public class MainTeleOp extends CommandOpMode {
         telemetry.addData("Last Heading Target", lastHeadingLock);
         telemetry.addData("Stick Hypot", Math.hypot(Gamepad1.getRightX(), Gamepad1.getRightY()));
 
-        telemetry.addData("Shooter Speed", shooter.getVelocity());
+        telemetry.addData("Shooter Target Speed", shooter.isInTargetSpeed());
         telemetry.addData("R Angle", Math.toDegrees(Math.atan2(-Gamepad1.getRightY(), -Gamepad1.getRightX())));
-        dashboard.addData("Shooter Speed", shooter.getVelocity());
 
         dashboard.update();
 

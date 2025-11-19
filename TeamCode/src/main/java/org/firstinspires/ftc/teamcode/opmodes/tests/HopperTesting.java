@@ -3,55 +3,33 @@ package org.firstinspires.ftc.teamcode.opmodes.tests;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.seattlesolvers.solverslib.command.CommandBase;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-import com.seattlesolvers.solverslib.gamepad.ToggleButtonReader;
 
-import org.firstinspires.ftc.teamcode.constants.ColorConstants;
-import org.firstinspires.ftc.teamcode.constants.HopperConstants;
 import org.firstinspires.ftc.teamcode.subsystems.HopperSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 
 @TeleOp(name = "Hopper Testing", group = "Test") @Config
 public class HopperTesting extends LinearOpMode {
-
     public HopperSubsystem hopper;
-    public IntakeSubsystem intake;
-    public ToggleButtonReader intakeOn;
-    public GamepadEx gp;
 
     public void runOpMode() {
-
         hopper = new HopperSubsystem(hardwareMap);
-        intake = new IntakeSubsystem(hardwareMap);
-        gp = new GamepadEx(gamepad1);
-        intakeOn = new ToggleButtonReader(gp, GamepadKeys.Button.A);
 
+        hopper.findHopperHomePosition();
 
-
-        while (opModeInInit()) {
-            hopper.runToMagnetZero();
-        }
-
+        waitForStart();
         while (opModeIsActive()) {
-            gp.readButtons();
+            if (gamepad1.rightBumperWasPressed()) hopper.setTargetPosition(1);
+            if (gamepad1.leftBumperWasPressed()) hopper.setTargetPosition(-1);
 
-            ColorConstants.Ball ballColor = ColorConstants.detetctedColor(hopper.getBottomColor());
+            hopper.rotateHopperOnePosition(1);
+            hopper.readHopperPosition();
 
-            if (gp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) >= 0.1) {
-                intake.setIntakePower(1.0);
-            }
-            else intake.setIntakePower(0.0);
+            telemetry.addData("Encoder Ticks", hopper.hopperEncoderTicks);
+            telemetry.addData("Servo Power", hopper.hopperServoPower);
+            telemetry.addData("Hopper Position", hopper.hopperPosition);
+            telemetry.addData("P", hopper.hopperPTerm);
+            telemetry.addData("D", hopper.hopperDTerm);
+            telemetry.addData("Error", hopper.hopperEncoderTicksError);
 
-            if (gp.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
-                hopper.intakeOneTick();
-            }
-            if (gp.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                hopper.extakeOneTick();
-            }
-
-            telemetry.addData("Detected Color", ballColor);
             telemetry.update();
         }
     }

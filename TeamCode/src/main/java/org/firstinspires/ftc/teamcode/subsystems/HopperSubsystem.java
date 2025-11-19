@@ -1,205 +1,94 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.constants.ColorConstants;
+
 import org.firstinspires.ftc.teamcode.constants.HopperConstants;
 
 
 public class HopperSubsystem extends SubsystemBase {
-    /// Object that references the center servo on the hopper.
-    private final CRServo servo;
+    private CRServo carouselServo;
+    private DcMotor motorEncoder;
+    private DigitalChannel magnetSwitch;
 
-    /// Object that references the axle's external encoder
-    private final DcMotor encoder;
+    public double hopperEncoderTicks = 0.0;
+    public double hopperEncoderTicksTarget = 0.0;
 
-    /// Object that references the Axon Servo's encoder wire
-    private final RevColorSensorV3 bottomSensor;
+    public double hopperEncoderTicksError = 0.0;
+    public double lastHopperEncoderTicksError;
 
-    /// Object that references the magnet switch on rotor
-    private final DigitalChannel magSwitch;
+    public double hopperPTerm = 0.0;
+    public double hopperITerm = 0.0;
+    public double hopperDTerm = 0.0;
+    public double hopperFTerm = 0.0;
 
-    /// Booleans used during initialization of the hopper
-    public boolean isHomed, magnetSeenDuringHoming;
+    public double hopperServoPower = 0.0;
 
-    /// Which position rotor is at (null if in between)
-    public Integer currentPosition;
+    private boolean hopperMotorIsBusy = false;
+    public double hopperPosition = 0.0;
 
-    ///
-    public int targetPosition;
-
-
-    /**
-     * Initialize the HopperSubsystem and initializes device settings
-     * @param map Uses the HardwareMap from your Auto/TeleOp to intiailize all of the hardware.
-     */
     public HopperSubsystem(HardwareMap map) {
-        servo = map.get(CRServo.class, "CarouselServo");
-        servo.setDirection(CRServo.Direction.REVERSE);
+        carouselServo = map.get(CRServo.class, "CarouselServo");
+        motorEncoder = map.get(DcMotor.class, "MotorEncoder");
+        magnetSwitch = map.get(DigitalChannel.class, "MagnetSwitch");
 
-        encoder = map.get(DcMotor.class, "MotorEncoder");
-        encoder.setDirection(DcMotor.Direction.FORWARD);
-        encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        magSwitch = map.get(DigitalChannel.class, "MagnetSwitch");
-        magSwitch.setMode(DigitalChannel.Mode.INPUT);
-
-        bottomSensor = map.get(RevColorSensorV3.class, "BottomSensor");
-
-        isHomed = false;
-        magnetSeenDuringHoming = false;
-
-        currentPosition = 0;
-        targetPosition = 0;
+        carouselServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    /// Run During init() Stage of TeleOp; Rotates hopper until it is physically zeroed with the magnet switch
-    public void runToMagnetZero() {
-        if (!this.isHomed) {
-            if (!this.magnetIsActive()) {
-                this.setServoPower(HopperConstants.HOMING_POWER);
-            }
-            else {
-                this.setServoPower(0.0);
-                this.isHomed = true;
-            }
-        }
-        else {
-            this.setServoPower(0.0);
-            this.zeroEncoder();
-            this.targetPosition = 0;
-        }
+    @Override
+    public void periodic() {
+        readHopperPosition();
     }
 
-    ///@return The position of the servo using the Through Bore Encoder
-    public int getEncoderPosition() {
-        return encoder.getCurrentPosition();
+    public void findHopperHomePosition() {
+        while (magnetSwitch.getState()) {
+            carouselServo.setPower(0.15);
+        }
+
+        carouselServo.setPower(0);
+
+        motorEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    /// @return The current position of the hopper
-    public Integer getHopperPosition() {
-        if (getEncoderPosition() <= 1 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
-                && getEncoderPosition() >= 1 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS)) {
-            return 1;
-        }
-        else if (getEncoderPosition() <= 2 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
-                && getEncoderPosition() >= 2 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS)) {
-            return 2;
-        }
-        else if (
-                (getEncoderPosition() <= 3 * (HopperConstants.TICKS_PER_STEP) + HopperConstants.TOLERANCE_TICKS
-                        && getEncoderPosition() >= 3 * (HopperConstants.TICKS_PER_STEP - HopperConstants.TOLERANCE_TICKS))
-                ||
-                        (getEncoderPosition() <= HopperConstants.TOLERANCE_TICKS)
-                                && getEncoderPosition() >= -HopperConstants.TOLERANCE_TICKS) {
-            return 2;
-        }
-        else return null;
+    public void setTargetPosition(int direction) {
+        this.hopperEncoderTicksTarget += Math.signum(direction) * 2731;
+        this.hopperEncoderTicks = Math.round(Math.round(this.hopperEncoderTicks / (8192.0 / 3.0)) * (8192.0 / 3.0));
     }
 
-    ///@return The power of the rotating servo
-    public double getServoPower() {
-        return servo.getPower();
-    }
+    public void rotateHopperOnePosition(int direction) {
+        this.hopperEncoderTicksError = this.hopperEncoderTicksTarget - this.hopperEncoderTicks;
 
-    /**
-     * Sets power of the center servo
-     * @param p power value
-     */
-    public void setServoPower(double p) {
-        servo.setPower(p);
-    }
+        this.hopperPTerm = this.hopperEncoderTicksError * HopperConstants.kp;
+        this.hopperDTerm = (this.hopperEncoderTicksError - this.lastHopperEncoderTicksError) * HopperConstants.kd;
 
-    /**
-     * Rotates servo to an encoder position
-     * @param target target position
-     */
-    public void toPositionRaw(int target) {
-        int error = target - getEncoderPosition();
-        double proportional = (double) target * HopperConstants.MOVE_KP;
-        double directionalMoveMax = Math.signum(error) * HopperConstants.MOVE_MAX;
+        this.lastHopperEncoderTicksError = this.hopperEncoderTicksError;
 
-        if (error <= HopperConstants.TOLERANCE_TICKS) {
-            setServoPower(0);
+        if (Math.abs(this.hopperEncoderTicksError) > 125) {
+            this.hopperFTerm = Math.signum(direction) * HopperConstants.kf;
+        } else {
+            this.hopperFTerm = 0.0;
         }
-        else {
-            if (Math.signum(error) == 1) {
-                setServoPower(Math.min(directionalMoveMax, proportional));
-            }
-            else if (Math.signum(error) == -1) {
-                setServoPower(Math.max(directionalMoveMax, proportional));
-            }
-            else {
-                setServoPower(0);
-            }
+
+        this.hopperServoPower = (this.hopperPTerm + this.hopperDTerm) * HopperConstants.hopperSpeedFactor + this.hopperFTerm;
+
+        if (Math.abs(this.hopperServoPower) > HopperConstants.hopperSpeedFactor) {
+            this.hopperServoPower = (Math.abs(this.hopperServoPower) / this.hopperServoPower) * HopperConstants.hopperSpeedFactor;
+        }
+
+        if (Math.abs(this.hopperEncoderTicksError) > 45) {
+            carouselServo.setPower(this.hopperServoPower);
+        } else {
+            carouselServo.setPower(0);
         }
     }
 
-    /**
-     * Rotates servo counter-clockwise to 1 of 3 hopper positions
-     * @param position target hopper position
-     */
-    public void intakeToHopperPosition(Integer position) {
-
-    }
-
-    /**
-     * Rotates servo clockwise to 1 of 3 hopper positions
-     * @param position target hopper position
-     */
-    public void extakeToHopperPosition(Integer position) {
-
-    }
-
-    /// Moves ccw 1 position
-    public void intakeOneTick() {
-        toPositionRaw(getEncoderPosition() + (int) HopperConstants.TICKS_PER_STEP);
-    }
-
-    /// Moves cw 1 position
-    public void extakeOneTick() {
-        toPositionRaw(getEncoderPosition() - (int) HopperConstants.TICKS_PER_STEP);
-    }
-
-    /// @return The distance from the Top Sensor
-//    public double getTopDistance() {
-//        return topSensor.getDistance(DistanceUnit.MM);
-//    }
-
-    /// @return The distance from the Bottom Sensor
-    public double getBottomDistance() {
-        return bottomSensor.getDistance(DistanceUnit.MM);
-    }
-
-    /// @return The color returned from the Top Sensor
-//    public NormalizedRGBA getTopColor() {
-//        return topSensor.getNormalizedColors();
-//    }
-
-    /// @return The color returned from the Bottom Sensor
-    public ColorConstants.RGB getBottomColor() {
-        return new ColorConstants.RGB(bottomSensor.red(), bottomSensor.green(), bottomSensor.blue());
-    }
-
-    /// @return Raw state of the magnet switch
-    public boolean magnetStateRaw() {
-        return magSwitch.getState();
-    }
-
-    /// @return If the magnet is making contact with switch
-    public boolean magnetIsActive() {
-        return !magnetStateRaw();
-    }
-
-    public void zeroEncoder() {
-        encoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    public void readHopperPosition() {
+        this.hopperEncoderTicks = motorEncoder.getCurrentPosition();
+        this.hopperPosition = Math.round((this.hopperEncoderTicks / 8192) / 3) % 3;
     }
 }

@@ -4,10 +4,10 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class HopperConstants {
-    public static int TICKS_PER_REVOLUTION = 2048;
-    public static double TICKS_PER_STEP = (double) TICKS_PER_REVOLUTION / 3.0;
-    public static double HOMING_POWER = 0.1;
-    public static double MOVE_KP = 0.002;
-    public static double MOVE_MAX = 0.5;
-    public static int TOLERANCE_TICKS = 10;
+    public static double kp = 0.0005;
+    public static double ki = 0.00;
+    public static double kd = 0.0001;
+    public static double kf = 0.00;
+
+    public static double hopperSpeedFactor = 0.4167;
 }
