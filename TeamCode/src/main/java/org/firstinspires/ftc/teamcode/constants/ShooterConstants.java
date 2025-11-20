@@ -13,6 +13,9 @@ public class ShooterConstants {
     public static double VELO_KF = 0.0;
     public static double VELO_MAX_INTEG_ERROR = 5.0;
 
-    public static double SPEED = 4500;
-    public static double SPEED_TOLERANCE = 5; // A max tolerance of ± 5tps (± 10rpm)
+    public static double BLUE_FAR_SPEED = 2080.0 * 60.0 / 28.0;
+    public static double BLUE_CLOSE_SPEED = 1580.0 * 60.0 / 28.0;
+    public static double RED_FAR_SPEED = 2060.0 * 60.0 / 28.0;
+    public static double RED_CLOSE_SPEED = 1600.0 * 60.0 / 28.0;
+    public static double SPEED_TOLERANCE = 5; // A max tolerance of ± 5tps (± 10.7rpm)
 }

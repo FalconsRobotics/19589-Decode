@@ -28,11 +28,11 @@ public class ShooterTester extends CommandOpMode {
             public void execute() {
                 telemetry.update();
 
-                dashboard.addData("Shooter Speed", shooter.getVelocity());
+//                dashboard.addData("Shooter Speed", shooter.getVelocity());
 
-                dashboard. addData("Motor Power: ", shooter.getMotorPower());
+//                dashboard. addData("Motor Power: ", shooter.getMotorPower());
 
-                dashboard.addData("Error: ", shooter.getError());
+//                dashboard.addData("Error: ", shooter.getError());
 
                 dashboard.update();
 
@@ -41,7 +41,7 @@ public class ShooterTester extends CommandOpMode {
 
         register(shooter);
 
-        shooter.setDefaultCommand(new ShooterSetSpeedCommand(shooter, () -> ShooterConstants.SPEED));
+//        shooter.setDefaultCommand(new ShooterSetSpeedCommand(shooter, () -> ShooterConstants.SPEED));
 
     }
 

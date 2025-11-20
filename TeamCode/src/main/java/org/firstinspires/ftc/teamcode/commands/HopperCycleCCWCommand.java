@@ -21,12 +21,7 @@ public class HopperCycleCCWCommand extends CommandBase {
     }
 
     @Override
-    public void execute() {
-        this.hopper.rotateHopperOnePosition(1);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return true;
+    public void initialize() {
+        this.hopper.setTargetPosition(1);
     }
 }

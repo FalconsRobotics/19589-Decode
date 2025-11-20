@@ -1,19 +1,28 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.constants.HopperConstants;
+
+import java.util.List;
 
 
 public class HopperSubsystem extends SubsystemBase {
     private CRServo carouselServo;
     private DcMotor motorEncoder;
     private DigitalChannel magnetSwitch;
+    private ColorRangeSensor colorSensor;
+
+    public List<Integer> colors;
+
+    public double hopperPosition = 0.0;
 
     public double hopperEncoderTicks = 0.0;
     public double hopperEncoderTicksTarget = 0.0;
@@ -29,12 +38,12 @@ public class HopperSubsystem extends SubsystemBase {
     public double hopperServoPower = 0.0;
 
     private boolean hopperMotorIsBusy = false;
-    public double hopperPosition = 0.0;
 
     public HopperSubsystem(HardwareMap map) {
         carouselServo = map.get(CRServo.class, "CarouselServo");
         motorEncoder = map.get(DcMotor.class, "MotorEncoder");
         magnetSwitch = map.get(DigitalChannel.class, "MagnetSwitch");
+        colorSensor = map.get(ColorRangeSensor.class, "ColorSensor");
 
         carouselServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -42,6 +51,7 @@ public class HopperSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         readHopperPosition();
+        rotateHopperOnePosition(1);
     }
 
     public void findHopperHomePosition() {
@@ -89,6 +99,25 @@ public class HopperSubsystem extends SubsystemBase {
 
     public void readHopperPosition() {
         this.hopperEncoderTicks = motorEncoder.getCurrentPosition();
-        this.hopperPosition = Math.round((this.hopperEncoderTicks / 8192) / 3) % 3;
+        this.hopperPosition = Math.round(this.hopperEncoderTicks % 3 / (8192.0 / 3.0));
+    }
+
+    /**
+     *
+     */
+    public void readIntakePositionColor() {
+        int redColorChannel;
+        int greenColorChannel;
+        int blueColorChannel;
+
+        if (colorSensor.getDistance(DistanceUnit.CM) <= 5) {
+            redColorChannel = colorSensor.red();
+            greenColorChannel = colorSensor.green();
+            blueColorChannel = colorSensor.blue();
+
+            if (redColorChannel > greenColorChannel) {
+                colors.set((int) this.hopperPosition, 0);
+            }
+        }
     }
 }

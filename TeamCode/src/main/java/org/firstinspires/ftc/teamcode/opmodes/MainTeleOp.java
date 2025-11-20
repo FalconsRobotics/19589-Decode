@@ -21,6 +21,7 @@ import com.seattlesolvers.solverslib.command.CommandBase;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -47,6 +48,8 @@ public class MainTeleOp extends CommandOpMode {
 
     // Stores the last angle we want to lock the heading to.
     private double lastHeadingLock = 0.0;
+
+    private boolean goalLock = false;
 
     @Override
     public void initialize_loop() {
@@ -83,6 +86,8 @@ public class MainTeleOp extends CommandOpMode {
         Gamepad1 = new GamepadEx(gamepad1);
         Gamepad2 = new GamepadEx(gamepad2);
 
+        hopper.findHopperHomePosition();
+
         // Tell SolversLib that this OpMode needs the drivebase, intake, hopper, shooter, and vision to function.
         register(drive, intake, hopper, shooter, vision);
 
@@ -116,21 +121,27 @@ public class MainTeleOp extends CommandOpMode {
 
         // When pressing X, we want to aim towards the respective goal when in the close position.
         Gamepad1.getGamepadButton(GamepadKeys.Button.X).whileHeld(
-                new FieldDriveLockCommand(
-                        drive,
-                        () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
-                        () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                        () -> isRedAlliance ? -45 : 45
+                new ParallelCommandGroup(
+                        new FieldDriveLockCommand(
+                            drive,
+                            () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
+                            () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
+                            () -> isRedAlliance ? -45 : 45
+                        ),
+                        new InstantCommand(() -> goalLock = false)
                 )
         );
 
         // When pressing B, we want to aim towards the respective goal when in the far position.
         Gamepad1.getGamepadButton(GamepadKeys.Button.B).whileHeld(
-                new FieldDriveLockCommand(
-                        drive,
-                        () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
-                        () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                        () -> isRedAlliance ? -27.5 : 27.5
+                new ParallelCommandGroup(
+                        new FieldDriveLockCommand(
+                                drive,
+                                () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
+                                () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
+                                () -> isRedAlliance ? -22.5 : 27.5
+                        ),
+                        new InstantCommand(() -> goalLock = false)
                 )
         );
 
@@ -156,21 +167,21 @@ public class MainTeleOp extends CommandOpMode {
 
         // When Utility presses the Left Bumper, we want to rotate clockwise, which shoots a ball.
         // But, we only want to do this whenever
-//        Gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileActiveOnce(
-//            // Conditional command: If the condition (either shooter is in the correct speed range OR the "override" A button is pressed)
-//            // is true, only then do we want to shoot. Otherwise, don't shoot, and just rumble the controller to signal to Utility that
-//            // you're not in the correct velocity range.
-//            new ConditionalCommand(
-//                    new HopperCycleCWCommand(hopper),
-//                    new InstantCommand(() -> gamepad1.rumbleBlips(3)),
-//                    () -> shooter.isInTargetSpeed() || Gamepad1.getButton(GamepadKeys.Button.A)
-//            )
-//        );
-//
-//        // When Utility presses the Right Bumper, we want to rotate counterclockwise, which intakes a ball.
-//        Gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileActiveOnce(
-//                new HopperCycleCCWCommand(hopper)
-//        );
+        Gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileActiveOnce(
+            // Conditional command: If the condition (either shooter is in the correct speed range OR the "override" A button is pressed)
+            // is true, only then do we want to shoot. Otherwise, don't shoot, and just rumble the controller to signal to Utility that
+            // you're not in the correct velocity range.
+            new ConditionalCommand(
+                    new HopperCycleCWCommand(hopper),
+                    new InstantCommand(() -> gamepad2.rumbleBlips(3)),
+                    () -> shooter.isInTargetSpeed() || Gamepad2.getButton(GamepadKeys.Button.A)
+            )
+        );
+
+        // When Utility presses the Right Bumper, we want to rotate counterclockwise, which intakes a ball.
+        Gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileActiveOnce(
+                new HopperCycleCCWCommand(hopper)
+        );
 
         /// ==================================================
         //endregion
@@ -178,7 +189,17 @@ public class MainTeleOp extends CommandOpMode {
         //region Extake/Shooter Control Code
         /// ==================================================
 
-        shooter.setDefaultCommand(new ShooterSetSpeedCommand(shooter, () -> 4500));
+        shooter.setDefaultCommand(new ShooterSetSpeedCommand(shooter, () -> isRedAlliance ? ShooterConstants.RED_CLOSE_SPEED : ShooterConstants.BLUE_CLOSE_SPEED));
+
+        // On Utility A, we want to say we're shooting close.
+        Gamepad2.getGamepadButton(GamepadKeys.Button.A).whileActiveOnce(
+                new ShooterSetSpeedCommand(shooter, () -> isRedAlliance ? ShooterConstants.RED_CLOSE_SPEED : ShooterConstants.BLUE_CLOSE_SPEED)
+        );
+
+        // On Utility Y, we want to say we're shooting far.
+        Gamepad2.getGamepadButton(GamepadKeys.Button.Y).whileActiveOnce(
+                new ShooterSetSpeedCommand(shooter, () -> isRedAlliance ? ShooterConstants.RED_FAR_SPEED : ShooterConstants.BLUE_FAR_SPEED)
+        );
 
         /// ==================================================
         //endregion
@@ -210,6 +231,9 @@ public class MainTeleOp extends CommandOpMode {
 
         telemetry.addData("Shooter Target Speed", shooter.isInTargetSpeed());
         telemetry.addData("R Angle", Math.toDegrees(Math.atan2(-Gamepad1.getRightY(), -Gamepad1.getRightX())));
+
+        telemetry.addData("Hopper Power", hopper.hopperServoPower);
+        telemetry.addData("Shooter Power", shooter.shooterMotor.getVelocity());
 
         dashboard.update();
 
