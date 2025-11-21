@@ -102,7 +102,8 @@ public class MainTeleOp extends CommandOpMode {
 //                    Gamepad1::getLeftY,
                     () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                     () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                    () -> lastHeadingLock
+                    () -> lastHeadingLock,
+                    () -> 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
             )
         );
 
@@ -126,7 +127,8 @@ public class MainTeleOp extends CommandOpMode {
                             drive,
                             () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                             () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                            () -> isRedAlliance ? -45 : 45
+                            () -> isRedAlliance ? -47.5 : 45,
+                            () -> 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
                         ),
                         new InstantCommand(() -> goalLock = false)
                 )
@@ -139,9 +141,20 @@ public class MainTeleOp extends CommandOpMode {
                                 drive,
                                 () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                                 () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                                () -> isRedAlliance ? -22.5 : 27.5
+                                () -> isRedAlliance ? -20 : 25,
+                                () -> 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
                         ),
                         new InstantCommand(() -> goalLock = false)
+                )
+        );
+
+        Gamepad1.getGamepadButton(GamepadKeys.Button.Y).whileHeld(
+                new FieldDriveLockCommand(
+                        drive,
+                        () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
+                        () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
+                        () -> -180,
+                        () -> 1 - ( Math.max(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER), 0.3)  )
                 )
         );
 

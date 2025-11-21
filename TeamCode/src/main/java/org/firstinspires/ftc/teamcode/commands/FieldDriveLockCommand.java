@@ -19,6 +19,7 @@ public class FieldDriveLockCommand extends CommandBase {
     private final DoubleSupplier forwardPower;
     private final DoubleSupplier strafePower;
     private final DoubleSupplier angleTurn;
+    private final DoubleSupplier multiplier;
 
     /**
      * Initializes the FieldDriveLockCommand.
@@ -27,13 +28,14 @@ public class FieldDriveLockCommand extends CommandBase {
      * @param suppliedForward Reference to the forward power you want the robot to move.
      * @param suppliedAngle Reference to the angle you want the robot to lock to.
      */
-    public FieldDriveLockCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedForward, DoubleSupplier suppliedAngle) {
+    public FieldDriveLockCommand(DrivebaseSubsystem suppliedDrive, DoubleSupplier suppliedStrafe, DoubleSupplier suppliedForward, DoubleSupplier suppliedAngle, DoubleSupplier suppliedMult) {
         // Set the internal members to our passed-in values, so that this command uses the inputs
         // and subsystems from our OpMode.
         this.drive = suppliedDrive;
         this.forwardPower = suppliedForward;
         this.strafePower = suppliedStrafe;
         this.angleTurn = suppliedAngle;
+        this.multiplier = suppliedMult;
 
         // Tell SolversLib that we need to use the DrivebaseSubsystem in this command.
         addRequirements(this.drive);
@@ -42,6 +44,6 @@ public class FieldDriveLockCommand extends CommandBase {
     @Override
     public void execute() {
         // Call the DrivebaseSubsystem drive function using our supplied movement values.
-        this.drive.driveFieldCentricHeadingLock(strafePower.getAsDouble(), forwardPower.getAsDouble(), angleTurn.getAsDouble());
+        this.drive.driveFieldCentricHeadingLock(strafePower.getAsDouble() * multiplier.getAsDouble(), forwardPower.getAsDouble() * multiplier.getAsDouble(), angleTurn.getAsDouble());
     }
 }
