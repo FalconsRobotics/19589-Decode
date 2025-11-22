@@ -12,5 +12,5 @@ public class DriveConstants {
     public static double MAX_ACCEL_CHANGE = 0.1;
 
     // The difference in heading that the robot will consider to be "lined up".
-    public static double HEADING_TOLERANCE = 5;
+    public static double HEADING_TOLERANCE = 1;
 }
