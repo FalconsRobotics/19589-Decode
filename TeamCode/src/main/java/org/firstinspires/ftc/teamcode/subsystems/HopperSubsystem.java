@@ -51,7 +51,7 @@ public class HopperSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         readHopperPosition();
-        rotateHopperOnePosition(1);
+        rotateHopper(1);
     }
 
     public void findHopperHomePosition() {
@@ -65,12 +65,12 @@ public class HopperSubsystem extends SubsystemBase {
         motorEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void setTargetPosition(int direction) {
+    public void moveOnePosition(int direction) {
         this.hopperEncoderTicksTarget += Math.signum(direction) * 2731;
         this.hopperEncoderTicks = Math.round(Math.round(this.hopperEncoderTicks / (8192.0 / 3.0)) * (8192.0 / 3.0));
     }
 
-    public void rotateHopperOnePosition(int direction) {
+    public void rotateHopper(int direction) {
         this.hopperEncoderTicksError = this.hopperEncoderTicksTarget - this.hopperEncoderTicks;
 
         this.hopperPTerm = this.hopperEncoderTicksError * HopperConstants.kp;

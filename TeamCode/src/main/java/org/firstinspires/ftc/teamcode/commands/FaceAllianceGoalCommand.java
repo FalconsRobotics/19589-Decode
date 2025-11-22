@@ -63,7 +63,7 @@ public class FaceAllianceGoalCommand extends CommandBase {
         }
 
         // Use your preferred frame here:
-        this.drive.driveFieldCentricHeadingLock(strafe, forward, rotCmd);
+//        this.drive.driveFieldCentricHeadingLock(strafe, forward, rotCmd);
     }
 
     @Override

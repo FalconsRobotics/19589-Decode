@@ -86,10 +86,11 @@ public class DrivebaseSubsystem extends SubsystemBase {
      */
     public void resetHeadingPID() {
         // Set the last angle error to 0.
-        this.lastAngleError = 0.0;
+//        this.lastAngleError = 0.0;
+        this.odo.recalibrateIMU();
 
         // Reset the timer to 0.
-        this.pidTimer.reset();
+//        this.pidTimer.reset();
     }
 
     /**
@@ -175,7 +176,7 @@ public class DrivebaseSubsystem extends SubsystemBase {
      * @param cY The y-value taken from the gamepad, used for forward/backward movement.
      * @param targetAngleDeg A custom heading to lock the drivebase to.
      */
-    public void driveFieldCentricHeadingLock(double cX, double cY, double targetAngleDeg) {
+    public void driveFieldCentricHeadingLock(double cX, double cY, double targetAngleDeg, double multiplier) {
         /// Obtain Necessary Values
         // Get the robot's current heading in radians, necessary for the trig functions
         // that make field-centric driving possible.
@@ -241,10 +242,10 @@ public class DrivebaseSubsystem extends SubsystemBase {
         // Store the powers for each wheel in its own variable for easy use.
         // There is some specific math for doing this, as when turning, the Mecanum wheels essentially
         // acts like a tank drive.
-        this.frontLeftPower = limitedForward + strafePower + turnPower;
-        this.frontRightPower = limitedForward - strafePower - turnPower;
-        this.backLeftPower = limitedForward - strafePower + turnPower;
-        this.backRightPower = limitedForward + strafePower - turnPower;
+        this.frontLeftPower = (limitedForward + strafePower + turnPower) * multiplier;
+        this.frontRightPower = (limitedForward - strafePower - turnPower) * multiplier;
+        this.backLeftPower = (limitedForward - strafePower + turnPower) * multiplier;
+        this.backRightPower = (limitedForward + strafePower - turnPower) * multiplier;
 
         // Normalize the motor powers to keep them between -1.0 to 1.0.
         double maxPower = Math.max(

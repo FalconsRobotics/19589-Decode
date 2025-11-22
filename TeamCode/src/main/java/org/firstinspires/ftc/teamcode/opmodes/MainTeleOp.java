@@ -98,12 +98,10 @@ public class MainTeleOp extends CommandOpMode {
         drive.setDefaultCommand(
             new FieldDriveLockCommand(
                     drive,
-//                    Gamepad1::getLeftX,
-//                    Gamepad1::getLeftY,
                     () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                     () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
                     () -> lastHeadingLock,
-                    () -> 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                    () -> (1 - Math.max(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER), 0.35))
             )
         );
 
@@ -127,8 +125,8 @@ public class MainTeleOp extends CommandOpMode {
                             drive,
                             () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                             () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
-                            () -> isRedAlliance ? -47.5 : 45,
-                            () -> 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                            () -> isRedAlliance ? -47.5 : 55,
+                            () -> (1 - Math.max(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER), 0.35))
                         ),
                         new InstantCommand(() -> goalLock = false)
                 )
@@ -142,7 +140,7 @@ public class MainTeleOp extends CommandOpMode {
                                 () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                                 () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
                                 () -> isRedAlliance ? -20 : 25,
-                                () -> 1 - Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                                () -> (1 - Math.max(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER), 0.35))
                         ),
                         new InstantCommand(() -> goalLock = false)
                 )
@@ -154,7 +152,7 @@ public class MainTeleOp extends CommandOpMode {
                         () -> isRedAlliance ? Gamepad1.getLeftY() : -Gamepad1.getLeftY(),
                         () -> isRedAlliance ? -Gamepad1.getLeftX() : Gamepad1.getLeftX(),
                         () -> -180,
-                        () -> 1 - ( Math.max(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER), 0.3)  )
+                        () -> (1 - Math.max(Gamepad1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER), 0.35))
                 )
         );
 
@@ -221,7 +219,7 @@ public class MainTeleOp extends CommandOpMode {
         /// ==================================================
 
         // We need an emergency heading reset, just in case!
-        Gamepad2.getGamepadButton(GamepadKeys.Button.OPTIONS).whileActiveOnce(new CommandBase() {
+        Gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON).whileActiveOnce(new CommandBase() {
             @Override
             public void execute() {
                  drive.resetHeadingPID();
